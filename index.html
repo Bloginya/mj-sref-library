@@ -191,6 +191,7 @@ main{padding:24px 0 170px}
 .lb-stage a:hover{transform:scale(1.015)}
 .lb-stage img{width:100%;display:block;background:rgba(255,255,255,.04)}
 .lb-side{padding:clamp(20px,2.4vw,30px);display:flex;flex-direction:column;gap:16px;border-left:1px solid var(--edge-soft);background:rgba(255,255,255,.035)}
+.lb-side .eyebrow{padding-right:44px}
 .lb-side h2{font-family:var(--serif);font-weight:400;font-size:42px;line-height:1;margin:4px 0 0}
 .lb-close{position:absolute;top:12px;right:12px;z-index:3;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
   background:rgba(12,9,18,.5);border:1px solid var(--edge-soft);backdrop-filter:blur(10px);transition:transform 140ms ease-out,background 180ms ease}
@@ -228,11 +229,12 @@ footer code{font-family:var(--mono);color:var(--bone-2)}
         <div>
           <div class="eyebrow">daryakruk.ai — midjourney library</div>
           <h1>Style <em>Index</em></h1>
-          <p class="lede">Every <b>--sref</b> code and <b>--p</b> profile I've worked with, next to the images it actually produced. Hover a card to flip through its examples, tap the code to copy it, or stack several in the builder and copy the whole parameter string.</p>
+          <p class="lede">Every <b>--sref</b> code, <b>--p</b> profile and combination I've worked with across both Midjourney accounts, next to the images it actually produced. Hover a card to flip through its examples, tap the code to copy it, or stack several in the builder and copy the whole parameter string.</p>
         </div>
         <div class="stats">
           <div class="stat"><b id="st-s">0</b><span>style codes</span></div>
           <div class="stat"><b id="st-p">0</b><span>profiles</span></div>
+          <div class="stat"><b id="st-c">0</b><span>combos</span></div>
         </div>
       </div>
       <div class="reel"><div class="reel-track" id="reel"></div></div>
@@ -244,6 +246,7 @@ footer code{font-family:var(--mono);color:var(--bone-2)}
           <span class="ind" id="ind"></span>
           <button class="tab" role="tab" data-tab="sref" aria-selected="true">Styles<span class="n" id="n-s"></span></button>
           <button class="tab" role="tab" data-tab="profile" aria-selected="false">Profiles<span class="n" id="n-p"></span></button>
+          <button class="tab" role="tab" data-tab="combo" aria-selected="false">Combos<span class="n" id="n-c"></span></button>
           <button class="tab" role="tab" data-tab="fav" aria-selected="false">Saved<span class="n" id="n-f"></span></button>
         </div>
         <label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--mute)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -262,6 +265,7 @@ footer code{font-family:var(--mono);color:var(--bone-2)}
   <main>
     <div class="meta"><span id="count"></span><span id="upd"></span></div>
     <div class="grid" id="grid"></div>
+    <div id="more" style="height:1px"></div>
   </main>
 
   <footer>
@@ -297,11 +301,13 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-const ALL=[...D.styles.map((s,i)=>({...s,kind:'sref',ord:i})),...D.profiles.map((s,i)=>({...s,kind:'profile',ord:i}))];
+const ALL=[...D.styles.map((s,i)=>({...s,kind:'sref',ord:i})),...D.profiles.map((s,i)=>({...s,kind:'profile',ord:i})),...(D.combos||[]).map((s,i)=>({...s,kind:'combo',ord:i}))];
+const comboStr=it=>[it.srefs.length?'--sref '+it.srefs.join(' '):'',it.profiles.length?'--p '+it.profiles.join(' '):''].filter(Boolean).join(' ');
+const codeLabel=it=>it.kind==='combo'?comboStr(it):(it.kind==='sref'?'<span class="k">--sref</span> ':'<span class="k">--p</span> ')+esc(it.code);
 const key=it=>it.kind+':'+it.code;
 const img=(ex,size)=>`https://cdn.midjourney.com/${ex.split('/')[0]}/${ex.split('/')[1]}_${size}_N.webp`;
 const job=ex=>`https://www.midjourney.com/jobs/${ex.split('/')[0]}?index=${ex.split('/')[1].split('_')[1]}`;
-const param=it=>it.kind==='sref'?`--sref ${it.code}`:`--p ${it.code}`;
+const param=it=>it.kind==='combo'?comboStr(it):it.kind==='sref'?`--sref ${it.code}`:`--p ${it.code}`;
 
 const S={tab:'sref',q:'',tags:new Set(),acct:'all',sort:'orig',
   favs:new Set(store.get('sref.favs',[])),pick:store.get('sref.pick',[]),sw:store.get('sref.sw',100)};
@@ -314,8 +320,8 @@ const ICON={
 };
 
 /* header numbers + atmosphere seeded from real examples */
-$('#st-s').textContent=D.styles.length; $('#st-p').textContent=D.profiles.length;
-$('#n-s').textContent=D.styles.length; $('#n-p').textContent=D.profiles.length;
+$('#st-s').textContent=D.styles.length; $('#st-p').textContent=D.profiles.length; $('#st-c').textContent=(D.combos||[]).length;
+$('#n-s').textContent=D.styles.length; $('#n-p').textContent=D.profiles.length; $('#n-c').textContent=(D.combos||[]).length;
 if(D.updated) $('#upd').textContent='Updated '+D.updated;
 const shuffled=[...ALL].sort(()=>Math.random()-.5);
 document.querySelectorAll('#aura i').forEach((el,i)=>{
@@ -325,14 +331,15 @@ const reelItems=shuffled.slice(0,26);
 $('#reel').innerHTML=[...reelItems,...reelItems].map(it=>
   `<img loading="lazy" src="${img(it.ex[0],384)}" alt="${esc(it.name)}" title="${esc(it.name)} · ${esc(it.code)}" onerror="this.remove()">`).join('');
 
-const accts=[...new Set(ALL.map(i=>i.account).filter(Boolean))];
+ALL.forEach(i=>{i.accounts=i.accounts||(i.account?[i.account]:[])});
+const accts=[...new Set(ALL.flatMap(i=>i.accounts))];
 $('#acct').innerHTML=`<option value="all">All accounts</option>`+accts.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
 if(accts.length<2) $('#acct').style.display='none';
 
 function pool(){ return S.tab==='fav' ? ALL.filter(i=>S.favs.has(key(i))) : ALL.filter(i=>i.kind===S.tab); }
 function filtered(){
   const q=S.q.trim().toLowerCase();
-  let r=pool().filter(i=>(S.acct==='all'||i.account===S.acct)
+  let r=pool().filter(i=>(S.acct==='all'||i.accounts.includes(S.acct))
     && [...S.tags].every(t=>i.tags.includes(t))
     && (!q||i.code.toLowerCase().includes(q)||i.name.toLowerCase().includes(q)||i.tags.some(t=>t.includes(q))));
   if(S.sort==='name') r.sort((a,b)=>a.name.localeCompare(b.name));
@@ -365,10 +372,10 @@ function card(it,n){
     <div class="info">
       <h3 class="name">${esc(it.name)}</h3>
       <div class="coderow">
-        <button class="code" data-copy="${esc(param(it))}" title="Copy ${esc(param(it))}"><span class="lbl"><span class="k">${it.kind==='sref'?'--sref':'--p'}</span> ${esc(it.code)}</span><span class="ic">${ICON.copy}</span></button>
+        <button class="code" data-copy="${esc(param(it))}" title="Copy ${esc(param(it))}"><span class="lbl" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${it.kind==='combo'?esc(codeLabel(it)):codeLabel(it)}</span><span class="ic">${ICON.copy}</span></button>
         <button class="add${picked?' on':''}" data-pick aria-label="Add to builder">${picked?ICON.check:ICON.plus}</button>
       </div>
-      <div class="ctags">${it.tags.map(t=>`<button data-tag="${esc(t)}">#${esc(t)}</button>`).join('')}${accts.length>1?`<span class="acct">${esc(it.account)}</span>`:''}</div>
+      <div class="ctags">${it.tags.map(t=>`<button data-tag="${esc(t)}">#${esc(t)}</button>`).join('')}${accts.length>1?`<span class="acct">${esc(it.accounts.join(' · '))}</span>`:''}</div>
     </div>
   </article>`;
 }
@@ -377,11 +384,23 @@ let current=[];
 function render(){
   current=filtered();
   $('#n-f').textContent=S.favs.size||'';
-  $('#count').textContent=`${current.length} ${S.tab==='profile'?'profiles':S.tab==='fav'?'saved':'styles'}`;
-  $('#grid').innerHTML=current.length?current.map(card).join(''):
+  $('#count').textContent=`${current.length} ${S.tab==='profile'?'profiles':S.tab==='combo'?'combos':S.tab==='fav'?'saved':'styles'}`;
+  shown=0;
+  $('#grid').innerHTML=current.length?'':
     `<div class="empty">${S.tab==='fav'?'Nothing saved yet — tap the heart on a card.':'No matches.'}</div>`;
+  more();
   renderTags(); renderDock(); moveIndicator();
 }
+/* incremental rendering: 48 cards at a time */
+let shown=0; const PAGE=48;
+function more(){
+  if(shown>=current.length) return;
+  const slice=current.slice(shown,shown+PAGE);
+  $('#grid').insertAdjacentHTML('beforeend',slice.map((it,i)=>card(it,i)).join(''));
+  shown+=slice.length;
+  $('#more').style.display=shown<current.length?'block':'none';
+}
+const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting))more();},{rootMargin:'900px 0px'});
 
 /* hover: cycle through a style's examples */
 let cyc=null;
@@ -421,8 +440,8 @@ function stopCycle(){
 function renderDock(){
   const items=S.pick.map(k=>ALL.find(i=>key(i)===k)).filter(Boolean);
   $('#dock').classList.toggle('show',items.length>0);
-  $('#pills').innerHTML=items.map(i=>`<span class="pill${i.kind==='profile'?' p':''}">${i.kind==='profile'?'p ':''}${esc(i.code)}<button data-unpick="${esc(key(i))}" aria-label="Remove">×</button></span>`).join('');
-  const sr=items.filter(i=>i.kind==='sref').map(i=>i.code), pr=items.filter(i=>i.kind==='profile').map(i=>i.code);
+  $('#pills').innerHTML=items.map(i=>`<span class="pill${i.kind==='profile'?' p':''}">${i.kind==='profile'?'p ':i.kind==='combo'?'combo ':''}${esc(i.kind==='combo'?i.name:i.code)}<button data-unpick="${esc(key(i))}" aria-label="Remove">×</button></span>`).join('');
+  const sr=[...new Set(items.flatMap(i=>i.kind==='sref'?[i.code]:i.kind==='combo'?i.srefs:[]))], pr=[...new Set(items.flatMap(i=>i.kind==='profile'?[i.code]:i.kind==='combo'?i.profiles:[]))];
   let s=''; if(sr.length) s+=`--sref ${sr.join(' ')}`;
   if(pr.length) s+=`${s?' ':''}--p ${pr.join(' ')}`;
   if(sr.length&&+S.sw!==100) s+=` --sw ${S.sw}`;
@@ -450,13 +469,13 @@ function openLb(i){
   const it=current[i]; if(!it) return; lbi=i; stopCycle();
   $('#lbimg').innerHTML=it.ex.map(e=>`<a href="${job(e)}" target="_blank" rel="noopener" title="Open the original job"><img src="${img(e,640)}" alt="${esc(it.name)}" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${img(e,384)}'}else{this.parentNode.remove()}"></a>`).join('');
   $('#lbside').innerHTML=`
-    <div class="eyebrow">${it.kind==='sref'?'Style reference':'Personalization profile'} · № ${String(it.ord+1).padStart(3,'0')}</div>
+    <div class="eyebrow">${it.kind==='sref'?'Style reference':it.kind==='combo'?'Combination':'Personalization profile'} · № ${String(it.ord+1).padStart(3,'0')}</div>
     <h2>${esc(it.name)}</h2>
-    <button class="code" data-copy="${esc(param(it))}"><span class="lbl"><span class="k">${it.kind==='sref'?'--sref':'--p'}</span> ${esc(it.code)}</span><span class="ic">${ICON.copy}</span></button>
-    <button class="code" data-copy="${esc(it.code)}"><span class="lbl"><span class="k">code only</span> ${esc(it.code)}</span><span class="ic">${ICON.copy}</span></button>
+    <button class="code" data-copy="${esc(param(it))}"><span class="lbl">${it.kind==='combo'?esc(codeLabel(it)):codeLabel(it)}</span><span class="ic">${ICON.copy}</span></button>
+    ${it.kind==='combo'?'':`<button class="code" data-copy="${esc(it.code)}"><span class="lbl"><span class="k">code only</span> ${esc(it.code)}</span><span class="ic">${ICON.copy}</span></button>`}
     <div class="ctags" style="font-size:13px">${it.tags.map(t=>`<button data-tag="${esc(t)}">#${esc(t)}</button>`).join('')}</div>
     <button class="btn ghost" data-pick-lb>${S.pick.includes(key(it))?'Remove from builder':'Add to builder'}</button>
-    ${it.account?`<div class="hint">Account: <span class="acct">${esc(it.account)}</span></div>`:''}
+    ${it.accounts.length?`<div class="hint">Account: <span class="acct">${esc(it.accounts.join(' · '))}</span></div>`:''}
     <p class="hint">Click an image to open its Midjourney job. ← → to browse, Esc to close.</p>
     <div class="lb-nav" style="margin-top:auto"><button class="btn ghost" data-lb="-1">← Prev</button><button class="btn ghost" data-lb="1">Next →</button></div>`;
   $('#lb').classList.add('open'); document.body.style.overflow='hidden';
@@ -495,6 +514,7 @@ document.addEventListener('keydown',e=>{
   }else if(e.key==='/'&&document.activeElement!==$('#q')){e.preventDefault();$('#q').focus();}
 });
 
+io.observe($('#more'));
 render();
 addEventListener('load',moveIndicator);
 })();
