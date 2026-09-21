@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.midjourney.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,600&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23100d16'/%3E%3Ctext x='16' y='23' font-family='Georgia' font-style='italic' font-size='20' text-anchor='middle' fill='%23e9c9a2'%3Es%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -19,9 +19,9 @@
   --edge:rgba(255,255,255,.14);
   --edge-soft:rgba(255,255,255,.08);
   --shadow:0 20px 50px -20px rgba(0,0,0,.75);
-  --serif:"Instrument Serif","Times New Roman",serif;
-  --sans:"Hanken Grotesk",system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --serif:"Chakra Petch","Geist",system-ui,sans-serif;
+  --sans:"Geist",system-ui,sans-serif;
+  --mono:"Geist Mono",ui-monospace,monospace;
   --ease-out:cubic-bezier(.23,1,.32,1);
   --ease-io:cubic-bezier(.77,0,.175,1);
   --r:18px; --gutter:clamp(16px,3.2vw,44px);
@@ -48,7 +48,22 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
              linear-gradient(180deg,rgba(11,9,16,.35) 0%,rgba(11,9,16,.82) 55%,rgba(11,9,16,.96) 100%)}
 .grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.05;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.techgrid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:56px 56px;mask-image:radial-gradient(120% 70% at 50% 0%,#000 30%,transparent 80%);-webkit-mask-image:radial-gradient(120% 70% at 50% 0%,#000 30%,transparent 80%)}
 .wrap{position:relative;z-index:1;padding:0 var(--gutter)}
+
+/* ---------- border beam (vanilla port of the Beam effect) ---------- */
+@property --a{syntax:"<angle>";initial-value:0deg;inherits:true}
+.beam{--s:.7;position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;z-index:4;opacity:0;transition:opacity 360ms ease;animation:orbit 3.6s linear infinite;animation-play-state:paused}
+.beam i{position:absolute;inset:0;border-radius:inherit;padding:1.5px;
+  background:conic-gradient(from var(--a),transparent 0 58%,#ff4d8d 68%,#ffb347 75%,#3ef0c6 82%,#4c8dff 89%,#b56cff 95%,transparent 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.beam b{position:absolute;inset:0;border-radius:inherit;filter:blur(9px);opacity:var(--s)}
+.beam b i{padding:3px}
+.beam.on,.card:hover .beam,.card:focus-within .beam{opacity:1;animation-play-state:running}
+.beam.slow{animation-duration:7s}
+@keyframes orbit{to{--a:360deg}}
 
 /* ---------- glass primitive ---------- */
 .glass{background:var(--glass);border:1px solid var(--edge-soft);backdrop-filter:blur(26px) saturate(1.7);-webkit-backdrop-filter:blur(26px) saturate(1.7);box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.12)}
@@ -57,14 +72,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 header.hero{padding:clamp(26px,5vw,56px) 0 0}
 .hero-card{position:relative;overflow:hidden;border-radius:calc(var(--r) + 10px);padding:clamp(24px,4vw,52px)}
 .hero-grid{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:flex-end}
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
-h1{font-family:var(--serif);font-weight:400;font-size:clamp(52px,10.5vw,148px);line-height:.85;margin:16px 0 0;letter-spacing:-.02em}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(48px,9.4vw,132px);line-height:.88;margin:16px 0 0;letter-spacing:-.035em;text-transform:uppercase}
 h1 em{background:linear-gradient(100deg,var(--brass),var(--rose) 45%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
 .lede{max-width:46ch;color:var(--bone-2);font-size:15.5px;line-height:1.6;margin:20px 0 0}
 .lede b{color:var(--bone);font-weight:500}
 .stats{display:flex;gap:14px}
-.stat{border-radius:16px;padding:14px 20px;min-width:104px;background:var(--glass-2);border:1px solid var(--edge-soft)}
-.stat b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(30px,4.4vw,48px);line-height:1}
+.stat{position:relative;border-radius:16px;padding:14px 20px;min-width:104px;background:var(--glass-2);border:1px solid var(--edge-soft)}
+.stat b{display:block;font-family:var(--mono);font-weight:500;letter-spacing:-.04em;font-size:clamp(30px,4.4vw,48px);line-height:1}
 .stat span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
 @media (max-width:760px){.hero-grid{grid-template-columns:1fr}.stats{flex-wrap:wrap}}
 
@@ -77,6 +92,7 @@ h1 em{background:linear-gradient(100deg,var(--brass),var(--rose) 45%,var(--viole
 @keyframes slide{to{transform:translate3d(-50%,0,0)}}
 
 /* ---------- toolbar ---------- */
+.bar:focus-within .beam{opacity:1;animation-play-state:running}
 .bar{position:sticky;top:12px;z-index:30;margin:22px 0 0;border-radius:999px;padding:9px 12px}
 .bar-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .seg{position:relative;display:flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--edge-soft)}
@@ -122,6 +138,14 @@ main{padding:24px 0 170px}
 .dots i{width:14px;height:3px;border-radius:2px;background:rgba(255,255,255,.35);transition:background 200ms ease,width 200ms var(--ease-out)}
 .dots i.on{background:var(--bone);width:20px}
 .idx{position:absolute;top:12px;left:13px;z-index:2;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:rgba(255,255,255,.85);text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.mixb{position:absolute;right:12px;bottom:11px;z-index:2;display:none;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#ffd9a0;background:rgba(12,9,18,.62);border:1px solid rgba(255,190,110,.35);backdrop-filter:blur(8px)}
+.mixb.on{display:flex}
+.mixb::before{content:"";width:6px;height:6px;border-radius:50%;background:linear-gradient(135deg,#ff4d8d,#ffb347)}
+.onlymix{margin-top:8px;font-family:var(--mono);font-size:10.5px;color:#d9b98a;opacity:.85}
+.lb-stage a{position:relative}
+.lb-stage .cap{position:absolute;left:8px;right:8px;bottom:8px;padding:5px 8px;border-radius:8px;font-family:var(--mono);font-size:10.5px;line-height:1.35;color:#ffd9a0;background:rgba(10,8,14,.72);backdrop-filter:blur(8px)}
+.lb-stage .cap.solo{color:var(--teal)}
 .fav{position:absolute;top:8px;right:8px;z-index:3;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
   background:rgba(12,9,18,.45);backdrop-filter:blur(10px);border:1px solid var(--edge-soft);opacity:0;
   transition:opacity 200ms ease,transform 160ms ease-out,background 200ms ease}
@@ -130,7 +154,7 @@ main{padding:24px 0 170px}
 .fav svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:1.7}
 .fav.on svg{fill:var(--rose);stroke:var(--rose)}
 .info{padding:14px 6px 0}
-.name{font-family:var(--serif);font-size:26px;line-height:1.02;margin:0}
+.name{font-family:var(--serif);font-weight:600;font-size:21px;line-height:1.1;letter-spacing:-.01em;margin:0}
 .coderow{display:flex;gap:8px;margin-top:11px}
 .code{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:10px;height:40px;padding:0 13px;border-radius:12px;
   font-family:var(--mono);font-size:13px;text-align:left;background:rgba(255,255,255,.05);border:1px solid var(--edge-soft);
@@ -152,7 +176,7 @@ main{padding:24px 0 170px}
 .ctags button{transition:color 160ms ease}
 .ctags button:hover{color:var(--bone)}
 .acct{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);opacity:.85}
-.empty{grid-column:1/-1;padding:90px 0;text-align:center;color:var(--mute);font-family:var(--serif);font-size:30px}
+.empty{grid-column:1/-1;padding:90px 0;text-align:center;color:var(--mute);font-family:var(--serif);font-size:24px}
 
 /* ---------- builder dock ---------- */
 .dock{position:fixed;left:50%;bottom:16px;z-index:40;width:min(940px,calc(100% - 22px));border-radius:22px;padding:14px 16px;
@@ -192,7 +216,8 @@ main{padding:24px 0 170px}
 .lb-stage img{width:100%;display:block;background:rgba(255,255,255,.04)}
 .lb-side{padding:clamp(20px,2.4vw,30px);display:flex;flex-direction:column;gap:16px;border-left:1px solid var(--edge-soft);background:rgba(255,255,255,.035)}
 .lb-side .eyebrow{padding-right:44px}
-.lb-side h2{font-family:var(--serif);font-weight:400;font-size:42px;line-height:1;margin:4px 0 0}
+.lb-side>*{flex-shrink:0}
+.lb-side h2{font-family:var(--serif);font-weight:600;font-size:34px;line-height:1;margin:4px 0 0}
 .lb-close{position:absolute;top:12px;right:12px;z-index:3;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;
   background:rgba(12,9,18,.5);border:1px solid var(--edge-soft);backdrop-filter:blur(10px);transition:transform 140ms ease-out,background 180ms ease}
 .lb-close:hover{background:rgba(255,255,255,.12)}
@@ -220,11 +245,11 @@ footer code{font-family:var(--mono);color:var(--bone-2)}
 </head>
 <body>
 <div id="aura"><i></i><i></i><i></i><i></i></div>
-<div class="veil"></div><div class="grain"></div>
+<div class="veil"></div><div class="techgrid"></div><div class="grain"></div>
 
 <div class="wrap">
   <header class="hero">
-    <div class="hero-card glass">
+    <div class="hero-card glass"><span class="beam on slow"><i></i><b><i></i></b></span>
       <div class="hero-grid">
         <div>
           <div class="eyebrow">daryakruk.ai — midjourney library</div>
@@ -240,7 +265,7 @@ footer code{font-family:var(--mono);color:var(--bone-2)}
       <div class="reel"><div class="reel-track" id="reel"></div></div>
     </div>
 
-    <div class="bar glass">
+    <div class="bar glass"><span class="beam"><i></i><b><i></i></b></span>
       <div class="bar-row">
         <div class="seg" role="tablist" id="seg">
           <span class="ind" id="ind"></span>
@@ -256,6 +281,7 @@ footer code{font-family:var(--mono);color:var(--bone-2)}
           <option value="orig">Default order</option>
           <option value="name">Name A–Z</option>
           <option value="code">Code</option>
+          <option value="clean">Clean examples first</option>
         </select>
       </div>
       <div class="tags" id="tags"></div>
@@ -274,7 +300,7 @@ footer code{font-family:var(--mono);color:var(--bone-2)}
   </footer>
 </div>
 
-<div class="dock glass" id="dock" aria-live="polite">
+<div class="dock glass" id="dock" aria-live="polite"><span class="beam on"><i></i><b><i></i></b></span>
   <div class="dock-top"><span class="dock-label">Builder</span><div class="pills" id="pills"></div><button class="btn ghost" id="clr" style="height:34px;padding:0 14px">Clear</button></div>
   <div class="dock-out">
     <div class="out" id="out"></div>
@@ -343,6 +369,7 @@ function filtered(){
     && [...S.tags].every(t=>i.tags.includes(t))
     && (!q||i.code.toLowerCase().includes(q)||i.name.toLowerCase().includes(q)||i.tags.some(t=>t.includes(q))));
   if(S.sort==='name') r.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(S.sort==='clean') r.sort((a,b)=>((a.mx&&!a.solo)?1:0)-((b.mx&&!b.solo)?1:0)||a.ord-b.ord);
   else if(S.sort==='code') r.sort((a,b)=>a.code.localeCompare(b.code,undefined,{numeric:true}));
   return r;
 }
@@ -362,10 +389,13 @@ function renderTags(){
 
 function card(it,n){
   const ex=it.ex||[], picked=S.pick.includes(key(it));
+  const mx=it.mx||[];
   return `<article class="card glass" style="animation-delay:${Math.min(n,20)*26}ms" data-k="${esc(key(it))}">
+    <span class="beam"><i></i><b><i></i></b></span>
     <div class="frame" data-open>
-      ${ex.map((e,i)=>`<img class="${i===0?'on':''}" loading="${n<8?'eager':'lazy'}" src="${img(e,384)}" alt="${esc(it.name)} example ${i+1}" onerror="this.remove()">`).join('')}
-      <span class="idx">№ ${String(it.ord+1).padStart(3,'0')}</span>
+      ${ex.map((e,i)=>`<img class="${i===0?'on':''}" data-mx="${(mx[i]||[]).length}" loading="${n<8?'eager':'lazy'}" src="${img(e,384)}" alt="${esc(it.name)} example ${i+1}" onerror="this.remove()">`).join('')}
+      <span class="idx">#${String(it.ord+1).padStart(4,'0')}</span>
+      <span class="mixb${(mx[0]||[]).length?' on':''}">mix +${(mx[0]||[]).length}</span>
       ${ex.length>1?`<span class="dots">${ex.map((_,i)=>`<i class="${i===0?'on':''}"></i>`).join('')}</span>`:''}
     </div>
     <button class="fav${S.favs.has(key(it))?' on':''}" data-fav aria-label="Save">${ICON.heart}</button>
@@ -376,6 +406,7 @@ function card(it,n){
         <button class="add${picked?' on':''}" data-pick aria-label="Add to builder">${picked?ICON.check:ICON.plus}</button>
       </div>
       <div class="ctags">${it.tags.map(t=>`<button data-tag="${esc(t)}">#${esc(t)}</button>`).join('')}${accts.length>1?`<span class="acct">${esc(it.accounts.join(' · '))}</span>`:''}</div>
+      ${it.mx&&!it.solo?`<div class="onlymix">⚠ only used in mixes — images show it with other codes</div>`:''}
     </div>
   </article>`;
 }
@@ -416,7 +447,7 @@ if(fine&&!slow){
     cyc={el:f,t:setInterval(()=>{
       imgs[i].classList.remove('on'); dots[i]?.classList.remove('on');
       i=(i+1)%imgs.length;
-      imgs[i].classList.add('on'); dots[i]?.classList.add('on');
+      imgs[i].classList.add('on'); dots[i]?.classList.add('on'); badge(f,imgs[i]);
     },1100)};
   });
   document.addEventListener('mouseout',e=>{ if(cyc&&!e.relatedTarget?.closest?.('.frame')) stopCycle(); });
@@ -427,12 +458,14 @@ if(fine&&!slow){
     c.style.setProperty('--my',(e.clientY-r.top)+'px');
   },{passive:true});
 }
+function badge(f,im){const b=f.querySelector('.mixb');if(!b)return;const n=+im.dataset.mx||0;b.classList.toggle('on',n>0);b.textContent='mix +'+n;}
 function stopCycle(){
   if(!cyc) return;
   clearInterval(cyc.t);
   const imgs=[...cyc.el.querySelectorAll('img')], dots=[...cyc.el.querySelectorAll('.dots i')];
   imgs.forEach((im,j)=>im.classList.toggle('on',j===0));
   dots.forEach((d,j)=>d.classList.toggle('on',j===0));
+  if(imgs[0]) badge(cyc.el,imgs[0]);
   cyc=null;
 }
 
@@ -467,15 +500,17 @@ async function copy(t,btn){
 let lbi=-1;
 function openLb(i){
   const it=current[i]; if(!it) return; lbi=i; stopCycle();
-  $('#lbimg').innerHTML=it.ex.map(e=>`<a href="${job(e)}" target="_blank" rel="noopener" title="Open the original job"><img src="${img(e,640)}" alt="${esc(it.name)}" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${img(e,384)}'}else{this.parentNode.remove()}"></a>`).join('');
+  const mx=it.mx||[], pre=it.kind==='profile'?'--p':'--sref';
+  $('#lbimg').innerHTML=it.ex.map((e,j)=>`<a href="${job(e)}" target="_blank" rel="noopener" title="Open the original job"><img src="${img(e,640)}" alt="${esc(it.name)}" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${img(e,384)}'}else{this.parentNode.remove()}">${it.mx?(mx[j]&&mx[j].length?`<span class="cap">mix with ${esc(mx[j].slice(0,4).join(' '))}${mx[j].length>4?' +'+(mx[j].length-4):''}</span>`:`<span class="cap solo">this code only</span>`):''}</a>`).join('');
   $('#lbside').innerHTML=`
-    <div class="eyebrow">${it.kind==='sref'?'Style reference':it.kind==='combo'?'Combination':'Personalization profile'} · № ${String(it.ord+1).padStart(3,'0')}</div>
+    <div class="eyebrow">${it.kind==='sref'?'Style reference':it.kind==='combo'?'Combination':'Personalization profile'} · #${String(it.ord+1).padStart(4,'0')}</div>
     <h2>${esc(it.name)}</h2>
     <button class="code" data-copy="${esc(param(it))}"><span class="lbl">${it.kind==='combo'?esc(codeLabel(it)):codeLabel(it)}</span><span class="ic">${ICON.copy}</span></button>
     ${it.kind==='combo'?'':`<button class="code" data-copy="${esc(it.code)}"><span class="lbl"><span class="k">code only</span> ${esc(it.code)}</span><span class="ic">${ICON.copy}</span></button>`}
     <div class="ctags" style="font-size:13px">${it.tags.map(t=>`<button data-tag="${esc(t)}">#${esc(t)}</button>`).join('')}</div>
     <button class="btn ghost" data-pick-lb>${S.pick.includes(key(it))?'Remove from builder':'Add to builder'}</button>
     ${it.accounts.length?`<div class="hint">Account: <span class="acct">${esc(it.accounts.join(' · '))}</span></div>`:''}
+    ${it.mx?`<p class="hint" style="color:#d9b98a">${it.solo?`${it.solo} of ${it.ex.length} images use only this code; the rest were generated together with other codes.`:`This code was only ever used together with other codes, so every image here is a mix — the pure look may differ.`}</p>`:''}
     <p class="hint">Click an image to open its Midjourney job. ← → to browse, Esc to close.</p>
     <div class="lb-nav" style="margin-top:auto"><button class="btn ghost" data-lb="-1">← Prev</button><button class="btn ghost" data-lb="1">Next →</button></div>`;
   $('#lb').classList.add('open'); document.body.style.overflow='hidden';
