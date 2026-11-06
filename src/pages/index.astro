@@ -1,0 +1,546 @@
+---
+import Base from '../layouts/Base.astro';
+import Pic from '../components/Pic.astro';
+import Marquee from '../components/Marquee.astro';
+import Contact from '../components/Contact.astro';
+import { Image } from 'astro:assets';
+import { getHome, getProjects, getSettings, img, isGif } from '../lib/content';
+import { inline, paragraphs, lines } from '../lib/text';
+
+const home = await getHome();
+const settings = await getSettings();
+const projects = await getProjects();
+
+/** every image used inside a project's sections */
+const projectImages = (p: (typeof projects)[number]) => {
+  const out: string[] = [];
+  const add = (s?: string | null) => { if (s && !isGif(s) && !out.includes(s)) out.push(s); };
+  add(p.cover);
+  for (const s of p.sections as any[]) {
+    const v = s.value || {};
+    add(v.image); add(v.backgroundImage); add(v.poster);
+    (v.images || []).forEach((x: any) => add(x.image));
+  }
+  return out;
+};
+
+// Work list: featured projects (with their home texts) first, then the rest
+const featuredMap = new Map(home.featured.map((f) => [f.project, f]));
+const work = [
+  ...home.featured.map((f) => projects.find((p) => p.slug === f.project)).filter(Boolean),
+  ...projects.filter((p) => !featuredMap.has(p.slug)),
+].map((p) => {
+  const f = featuredMap.get(p!.slug);
+  const first = f?.image || p!.cover;
+  const imgs = projectImages(p!);
+  return {
+    slug: p!.slug,
+    name: p!.name,
+    badge: f?.badge || '',
+    tagline: f?.tagline || '',
+    cover: first,
+    cluster: [first, ...imgs.filter((x) => x !== first)].slice(0, 6),
+  };
+});
+
+// Hero wall: interleave images from all projects, 6 columns
+const pools = projects.map(projectImages);
+const wallAll: string[] = [];
+for (let i = 0; wallAll.length < 42 && i < 40; i++) pools.forEach((pl) => pl[i] && wallAll.push(pl[i]));
+const COLS = 6;
+const columns = Array.from({ length: COLS }, (_, c) => wallAll.filter((_, i) => i % COLS === c));
+
+const heroTop = lines(home.hero.topLeft).join(' ');
+const heroBottom = lines(home.hero.bottomRight).join(' ');
+const roles = lines(home.hero.topRight);
+---
+<Base>
+  <!-- ============ HERO ============ -->
+  <section class="hx theme-black" data-hero>
+    <div class="hx__wall" aria-hidden="true">
+      <div class="hx__plane" data-hero-plane>
+        {columns.map((col, c) => (
+          <div class="hx__col" style={`--dur:${46 + (c % 3) * 9}s;--dir:${c % 2 ? 'reverse' : 'normal'}`}>
+            {[0, 1].map(() => col.map((src) => {
+              const m = img(src);
+              return m && <Image src={m} alt="" widths={[320, 480]} sizes="16vw" format="webp" quality={70} loading="eager" class="hx__tile" />;
+            }))}
+          </div>
+        ))}
+      </div>
+    </div>
+    <div class="hx__shade" aria-hidden="true"></div>
+
+    <div class="hx__content" data-hero-content>
+      <span class="hx__art" aria-hidden="true">
+          <span class="hx__art-in" data-hero-art>
+            <Pic src={home.hero.image} alt="" eager reveal={false} sizes="(max-width: 800px) 90vw, 46vw" />
+          </span>
+        </span>
+      <ul class="hx__roles" role="list">
+        {roles.map((r, i) => <li class="hx-in" style={`--i:${i}`}>{r}</li>)}
+      </ul>
+      <h1 class="hx__title">
+        <span class="hx__l1" data-hero-line>{heroTop}</span>
+        <span class="hx__l2" data-hero-line>{heroBottom}</span>
+      </h1>
+      <div class="hx__foot">
+        <p class="hx__services hx-in" style="--i:2">{lines(home.hero.bottomLeft).slice(0, 6).join(' · ')}</p>
+        <a href="#contact" class="hx__cta hx-in" style="--i:3" data-magnetic="0.4" data-cursor="Let’s talk">
+          <span>{home.hero.ctaLabel}</span>
+        </a>
+        <div class="hx__scroll hx-in" style="--i:4" aria-hidden="true"><span></span>Scroll</div>
+      </div>
+    </div>
+  </section>
+  <Marquee items={home.services} />
+
+  <!-- ============ ABOUT ============ -->
+  <section class="ab theme-pink" data-about>
+    <div class="ab__glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <h2 class="ab__title">
+        <span class="ab__k" data-blur-chars>{home.about.kicker}</span>
+        <span class="ab__n" data-blur-chars data-delay="0.15"><em>{home.about.name}</em></span>
+      </h2>
+      <div class="ab__grid">
+        <div class="ab__photo" data-about-photo>
+          <Pic src={home.about.photo} alt={home.about.name} reveal={false} sizes="(max-width: 800px) 80vw, 34vw" />
+        </div>
+        <div class="ab__copy">
+          <div class="ab__text" data-scrub-words set:html={paragraphs(home.about.text)} />
+          {home.about.tagline && <p class="ab__tagline" data-blur-chars><em set:html={inline(home.about.tagline)} /></p>}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  {home.stats?.length > 0 && (
+    <section class="st theme-black">
+      <div class="wrap st__grid">
+        {home.stats.map((s, i) => (
+          <div class="st__item" data-reveal style={`--d:${i}`}>
+            <p class="st__num"><span data-count={s.value ?? 0}>{s.value}</span>{s.suffix}</p>
+            <p class="st__label">{s.label}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- ============ WORK (pinned list) ============ -->
+  <section class="wk theme-black" data-work>
+    <div class="wk__pin" data-work-pin>
+      <div class="wk__head wrap">
+        <h2 class="wk__title" data-blur-chars>{home.projectsTitle}</h2>
+        <p class="wk__counter"><span data-work-idx>01</span> / {String(work.length).padStart(2, '0')}</p>
+      </div>
+      <div class="wk__body wrap">
+        <ol class="wk__list" role="list">
+          {work.map((w, i) => (
+            <li class:list={['wk__item', { 'is-active': i === 0 }]} data-work-item={i}>
+              <a href={`/portfolio/${w.slug}`} data-cursor="View">
+                <span class="wk__arrow" aria-hidden="true">→</span>
+                <span class="wk__name">{w.name}</span>
+                {w.badge && <sup class="wk__badge">{w.badge}</sup>}
+              </a>
+              {w.tagline && <p class="wk__tag">{w.tagline}</p>}
+            </li>
+          ))}
+        </ol>
+        <div class="wk__stage" aria-hidden="true">
+          {work.map((w, i) => (
+            <a href={`/portfolio/${w.slug}`} class:list={['wk__cluster', { 'is-active': i === 0 }]} data-work-cluster={i} tabindex="-1" data-cursor="View">
+              {w.cluster.map((src, k) => (
+                <span class={`wk__img p${k + 1}`}><Pic src={src} alt="" reveal={false} sizes="(max-width: 800px) 50vw, 26vw" /></span>
+              ))}
+            </a>
+          ))}
+        </div>
+      </div>
+      <div class="wk__progress" aria-hidden="true"><span data-work-bar></span></div>
+    </div>
+
+    <!-- mobile version -->
+    <ul class="wk__mobile wrap" role="list">
+      {work.map((w) => (
+        <li>
+          <a href={`/portfolio/${w.slug}`}>
+            <Pic src={w.cover} alt={w.name} sizes="100vw" />
+            <span class="wk__mname">{w.badge && <em>{w.badge} </em>}{w.name} →</span>
+            {w.tagline && <span class="wk__mtag">{w.tagline}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="wrap wk__all"><a href="/portfolio" class="btn" data-magnetic>View all work ➺</a></div>
+  </section>
+
+  <!-- ============ REEL (horizontal scroll) ============ -->
+  {home.reel?.length > 0 && (
+    <section class="rl theme-black" data-reel>
+      <div class="rl__pin">
+        <div class="rl__track" data-reel-track>
+          <h2 class="rl__title">{home.reelTitle}<span class="rl__hint">Scroll →</span></h2>
+          {home.reel.map((r, i) => (
+            <figure class={`rl__item v${i % 4}`} data-zoom data-group="reel" data-cursor="Zoom">
+              <div class="rl__inner" data-reel-img>
+                <Pic src={r.image} alt={r.alt} reveal={false} sizes="(max-width: 800px) 80vw, 40vw" />
+              </div>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ============ TESTIMONIALS (stacking cards) ============ -->
+  <section class="ts theme-black">
+    <div class="wrap">
+      <h2 class="ts__title" data-blur-chars>{home.testimonialsTitle}</h2>
+      <div class="ts__stack">
+        {home.testimonials.map((t, i) => (
+          <figure class="ts__card" style={`--i:${i}`} data-ts-card>
+            <span class="ts__mark" aria-hidden="true">“</span>
+            <blockquote><p>{t.quote}</p></blockquote>
+            <figcaption><strong>{t.name}</strong><span>{t.role}</span></figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <Marquee items={home.clients} style="big" />
+
+  <!-- ============ BIG CTA ============ -->
+  <section class="cta theme-black">
+    <p class="cta__kicker" data-reveal>{settings.contactTitle}</p>
+    <h2 class="cta__big" data-blur-chars><em>{settings.contactTitleItalic}</em></h2>
+    <a href="#contact" class="cta__btn" data-magnetic="0.5" data-cursor="Write me">
+      <span>Start a project</span>
+    </a>
+  </section>
+
+  <Contact settings={settings} title="Tell me about" titleItalic="your project" />
+</Base>
+
+<style>
+  /* ============ HERO ============ */
+  .hx { position: relative; height: 100svh; min-height: 620px; overflow: hidden; isolation: isolate; }
+  .hx__wall { position: absolute; inset: 0; z-index: -2; perspective: 1400px; overflow: hidden; }
+  .hx__plane {
+    position: absolute; left: 50%; top: 50%;
+    width: 170vmax; height: 170vmax;
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.6vmax;
+    transform: translate(-50%, -50%) rotateX(52deg) rotateZ(-32deg);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .hx__col { display: flex; flex-direction: column; gap: 1.6vmax; animation: hxCol var(--dur) linear infinite; animation-direction: var(--dir); }
+  .hx__tile { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 0.6vmax; box-shadow: 0 2vmax 4vmax rgba(0, 0, 0, 0.5); }
+  @keyframes hxCol { to { transform: translateY(-50%); } }
+  .hx__shade {
+    position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 52%, rgba(0,0,0,0.5), rgba(0,0,0,0.9) 75%),
+      linear-gradient(to bottom, rgba(0,0,0,0.65), transparent 22%, transparent 70%, #000);
+  }
+  .hx__content { position: relative; height: 100%; display: grid; grid-template-rows: auto 1fr auto; padding: calc(var(--header-h) + 2vh) var(--gutter) 3vh; }
+  .hx__roles { list-style: none; margin: 0; padding: 0; justify-self: end; text-align: right; font-size: 12.5px; font-weight: 500; letter-spacing: 0.06em; line-height: 1.5; }
+  .hx__title { position: relative; z-index: 1; display: grid; align-content: center; row-gap: clamp(60px, 16vh, 200px); font-size: clamp(52px, 9.6vw, 170px); line-height: 0.86; margin: 0; }
+  .hx__l1 { justify-self: start; position: relative; z-index: 3; }
+  .hx__l2 { justify-self: end; text-align: right; position: relative; z-index: 3; }
+  .hx__art { position: absolute; left: 50%; top: 52%; width: min(46vw, 640px); translate: -50% -50%; z-index: 0; mix-blend-mode: screen; pointer-events: none; }
+  .hx__art-in { display: block; }
+  .hx__art :global(.media) { background: none; }
+  .hx__art :global(img) { object-fit: contain; animation: heroFloat 7s ease-in-out infinite; }
+  @keyframes heroFloat { 50% { transform: translateY(-16px) rotate(-1.5deg); } }
+  .hx__foot { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 20px; }
+  .hx__services { margin: 0; font-size: 12.5px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; max-width: 34ch; line-height: 1.5; }
+  .hx__cta {
+    display: grid; place-items: center; width: 150px; height: 150px; border-radius: 50%;
+    background: var(--accent); color: #000; text-decoration: none; text-align: center;
+    font: 600 13px/1.25 var(--font-body); letter-spacing: 0.04em; text-transform: uppercase; padding: 18px;
+    transition: background 0.4s;
+  }
+  .hx__cta:hover { background: #fff; }
+  .hx__scroll { justify-self: end; display: flex; align-items: center; gap: 10px; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .hx__scroll span { width: 1px; height: 46px; background: currentColor; animation: scrollLine 2s var(--ease-in-out) infinite; }
+  @keyframes scrollLine { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+  .js .hx-in { opacity: 0; transform: translateY(20px); }
+  :global(.hero-in) .hx-in { opacity: 1; transform: none; transition: opacity 1s var(--ease-out), transform 1.2s var(--ease-out); transition-delay: calc(0.5s + var(--i, 0) * 0.08s); }
+  @media (max-width: 760px) {
+    .hx__plane { width: 260vmax; height: 260vmax; }
+    .hx__title { font-size: clamp(48px, 15vw, 90px); gap: 34vw; }
+    .hx__art { width: 92vw; }
+    .hx__foot { grid-template-columns: 1fr auto; }
+    .hx__services { display: none; }
+    .hx__cta { width: 116px; height: 116px; font-size: 11px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .hx__col, .hx__art :global(img) { animation: none; } }
+
+  /* ============ ABOUT ============ */
+  .ab { position: relative; overflow: hidden; padding-block: clamp(90px, 13vw, 200px); }
+  .ab__glow { position: absolute; inset: 5% -20% auto; height: 80%; background: radial-gradient(closest-side, rgba(242, 190, 255, 0.95), transparent); filter: blur(40px); pointer-events: none; }
+  .ab__title { position: relative; display: grid; justify-items: center; text-align: center; font-size: clamp(56px, 12vw, 200px); line-height: 0.9; }
+  .ab__grid { position: relative; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 6vw, 110px); align-items: start; margin-top: clamp(48px, 7vw, 110px); }
+  .ab__photo { aspect-ratio: 4 / 5; overflow: hidden; clip-path: inset(18% 18% 18% 18% round 24px); }
+  .ab__photo :global(.media) { height: 100%; }
+  .ab__photo :global(img) { transform: scale(1.35); }
+  .ab__text { font-size: clamp(19px, 2vw, 30px); font-weight: 500; line-height: 1.25; text-transform: uppercase; letter-spacing: -0.005em; }
+  .ab__text :global(p) { margin-bottom: 0.8em; }
+  .ab__tagline { margin-top: 1.2em; font-family: var(--font-display); font-size: clamp(30px, 3.8vw, 58px); line-height: 1; text-transform: uppercase; }
+  .ab__tagline em { font-style: normal; display: inline-block; transform: skewX(-10deg); }
+  @media (max-width: 860px) { .ab__grid { grid-template-columns: 1fr; } .ab__photo { width: 78%; } }
+  @media (prefers-reduced-motion: reduce) { .ab__photo { clip-path: none; } .ab__photo :global(img) { transform: none; } }
+
+  /* ============ STATS ============ */
+  .st { padding-block: clamp(60px, 8vw, 120px); border-bottom: 1px solid rgba(255,255,255,0.12); }
+  .st__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .st__num { font-family: var(--font-display); font-size: clamp(54px, 7vw, 110px); line-height: 1; margin: 0 0 12px; }
+  .st__label { margin: 0; font-size: 14px; opacity: 0.7; max-width: 22ch; }
+  @media (max-width: 760px) { .st__grid { grid-template-columns: 1fr 1fr; row-gap: 40px; } }
+
+  /* ============ WORK ============ */
+  .wk { position: relative; }
+  .wk__pin { position: relative; height: 100svh; display: grid; grid-template-rows: auto 1fr auto; padding-top: calc(var(--header-h) + 10px); overflow: hidden; }
+  .wk__head { display: flex; justify-content: space-between; align-items: end; }
+  .wk__title { font-size: clamp(40px, 5vw, 78px); }
+  .wk__counter { font-family: var(--font-display); font-size: clamp(20px, 2vw, 30px); margin: 0; }
+  .wk__body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 4vw; align-items: center; min-height: 0; }
+  .wk__list { list-style: none; margin: 0; padding: 0; }
+  .wk__item a { display: inline-flex; align-items: baseline; gap: 0.25em; text-decoration: none; font-family: var(--font-display); font-size: clamp(38px, 4.7vw, 84px); line-height: 1.04; white-space: nowrap; text-transform: uppercase; color: rgba(255,255,255,0.22); transition: color 0.6s var(--ease-out); }
+  .wk__arrow { display: inline-block; width: 0; overflow: hidden; opacity: 0; transition: width 0.6s var(--ease-out), opacity 0.4s; font-family: var(--font-body); font-weight: 300; }
+  .wk__item.is-active a, .wk__item a:hover { color: #fff; }
+  .wk__item.is-active .wk__arrow { width: 0.9em; opacity: 1; }
+  .wk__badge { font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: var(--accent); align-self: flex-start; margin-top: 0.6em; text-transform: uppercase; }
+  .wk__tag { margin: 0; height: 0; overflow: hidden; opacity: 0; font-size: 14px; padding-left: 1.2em; transition: height 0.6s var(--ease-out), opacity 0.5s; }
+  .wk__item.is-active .wk__tag { height: 2.2em; opacity: 0.8; }
+  .wk__stage { position: relative; height: min(72vh, 760px); }
+  .wk__cluster { position: absolute; inset: 0; pointer-events: none; }
+  .wk__cluster.is-active { pointer-events: auto; }
+  .wk__img { position: absolute; display: block; overflow: hidden; border-radius: 10px; box-shadow: 0 30px 70px rgba(0,0,0,0.5); }
+  .wk__img :global(.media) { width: 100%; height: 100%; }
+  .wk__img.p1 { left: 18%; top: 10%; width: 52%; height: 70%; z-index: 3; }
+  .wk__img.p2 { left: 0; top: 4%; width: 22%; height: 30%; }
+  .wk__img.p3 { right: 0; top: 0; width: 24%; height: 36%; z-index: 4; }
+  .wk__img.p4 { left: 4%; bottom: 2%; width: 26%; height: 34%; z-index: 4; }
+  .wk__img.p5 { right: 4%; bottom: 0; width: 30%; height: 38%; }
+  .wk__img.p6 { left: 62%; top: 42%; width: 16%; height: 22%; z-index: 5; }
+  .wk__progress { height: 2px; margin: 0 var(--gutter) 3vh; background: rgba(255,255,255,0.12); }
+  .wk__progress span { display: block; height: 100%; background: var(--accent); transform-origin: left; transform: scaleX(0); }
+  .wk__mobile { display: none; }
+  .wk__all { padding-block: 40px clamp(70px, 9vw, 130px); }
+  @media (max-width: 860px), (prefers-reduced-motion: reduce) {
+    .wk__pin { height: auto; padding-bottom: 20px; }
+    .wk__body, .wk__progress, .wk__counter { display: none; }
+    .wk__mobile { display: grid; gap: 40px; list-style: none; margin: 0 auto; }
+    .wk__mobile a { display: grid; gap: 12px; text-decoration: none; }
+    .wk__mobile :global(.media) { aspect-ratio: 4 / 3; }
+    .wk__mname { font-family: var(--font-display); font-size: clamp(30px, 8vw, 52px); text-transform: uppercase; line-height: 1; }
+    .wk__mname em { color: var(--accent); }
+    .wk__mtag { font-size: 14px; opacity: 0.75; }
+  }
+
+  /* ============ REEL ============ */
+  .rl__pin { height: 100svh; display: flex; align-items: center; overflow: hidden; }
+  .rl__track { display: flex; align-items: center; gap: clamp(16px, 2.4vw, 40px); padding-inline: var(--gutter); will-change: transform; }
+  .rl__title { flex: 0 0 auto; width: min(42vw, 620px); font-size: clamp(56px, 8vw, 140px); line-height: 0.9; }
+  .rl__hint { display: block; margin-top: 24px; font: 500 13px/1 var(--font-body); letter-spacing: 0.12em; opacity: 0.6; }
+  .rl__item { flex: 0 0 auto; margin: 0; overflow: hidden; border-radius: 12px; }
+  .rl__item.v0 { width: clamp(260px, 34vw, 560px); aspect-ratio: 16 / 10; }
+  .rl__item.v1 { width: clamp(200px, 22vw, 380px); aspect-ratio: 4 / 5; align-self: flex-start; margin-top: 6vh; }
+  .rl__item.v2 { width: clamp(240px, 28vw, 460px); aspect-ratio: 1; align-self: flex-end; margin-bottom: 6vh; }
+  .rl__item.v3 { width: clamp(220px, 24vw, 400px); aspect-ratio: 3 / 4; }
+  .rl__inner { width: 100%; height: 100%; }
+  .rl__inner :global(.media) { height: 100%; }
+  .rl__inner :global(img) { transform: scale(1.18); }
+  @media (max-width: 860px), (prefers-reduced-motion: reduce) {
+    .rl__pin { height: auto; padding-block: 80px; }
+    .rl__track { overflow-x: auto; scroll-snap-type: x mandatory; width: 100%; }
+    .rl__title { width: 70vw; font-size: 56px; }
+    .rl__item { scroll-snap-align: center; }
+  }
+
+  /* ============ TESTIMONIALS ============ */
+  .ts { padding-block: clamp(80px, 10vw, 160px) clamp(60px, 8vw, 120px); }
+  .ts__title { font-size: clamp(44px, 6vw, 100px); margin-bottom: clamp(40px, 6vw, 80px); }
+  .ts__stack { display: grid; gap: 24px; }
+  .ts__card {
+    position: sticky; top: calc(var(--header-h) + 20px + var(--i) * 26px);
+    margin: 0; padding: clamp(28px, 4vw, 64px);
+    min-height: min(54vh, 460px);
+    display: grid; align-content: space-between; gap: 32px;
+    background: var(--pink); color: #000; border-radius: 22px;
+    transform-origin: 50% 0;
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.35);
+  }
+  .ts__card:nth-child(2) { background: #fff; }
+  .ts__card:nth-child(3) { background: var(--accent); }
+  .ts__mark { font-family: var(--font-display); font-size: 120px; line-height: 0.6; height: 50px; }
+  .ts__card blockquote { margin: 0; font-size: clamp(20px, 2.3vw, 34px); line-height: 1.25; font-weight: 500; max-width: 46ch; }
+  .ts__card figcaption { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; font-size: 15px; }
+  .ts__card figcaption strong { font-family: var(--font-display); font-weight: 400; font-size: 24px; text-transform: uppercase; }
+  .ts__card figcaption span { opacity: 0.7; }
+
+  /* ============ CTA ============ */
+  .cta { position: relative; padding: clamp(100px, 14vw, 220px) var(--gutter) clamp(40px, 6vw, 80px); text-align: center; overflow: hidden; }
+  .cta__kicker { font-size: 14px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; }
+  .cta__big { font-size: clamp(72px, 19vw, 340px); line-height: 0.82; white-space: nowrap; }
+  .cta__btn {
+    display: inline-grid; place-items: center; margin-top: clamp(30px, 4vw, 60px);
+    width: clamp(140px, 13vw, 190px); aspect-ratio: 1; border-radius: 50%;
+    border: 1.5px solid #fff; text-decoration: none; font: 600 13px/1.2 var(--font-body); letter-spacing: 0.06em; text-transform: uppercase;
+    transition: background 0.4s, color 0.4s;
+  }
+  .cta__btn:hover { background: #fff; color: #000; }
+</style>
+
+<script>
+  import { onPage, gsap, ScrollTrigger, reduceMotion } from '../scripts/motion';
+
+  const whenIntro = (fn: () => void) => {
+    if ((window as any).__introDone) fn();
+    else window.addEventListener('intro:done', fn, { once: true });
+  };
+
+  onPage(() => {
+    const hero = document.querySelector<HTMLElement>('[data-hero]');
+    if (!hero) return;
+    const reduce = reduceMotion();
+
+    /* ---- Hero intro ---- */
+    const lines = [...hero.querySelectorAll<HTMLElement>('[data-hero-line]')];
+    const art = hero.querySelector<HTMLElement>('[data-hero-art]')!;
+    const plane = hero.querySelector<HTMLElement>('[data-hero-plane]')!;
+    lines.forEach((l) => {
+      if (l.dataset.heroSplit) return;
+      l.dataset.heroSplit = '1';
+      l.innerHTML = (l.textContent || '')
+        .split(' ')
+        .map((w) => `<span class="wd">${[...w].map((c) => `<span class="ch">${c}</span>`).join('')}</span>`)
+        .join(' ');
+    });
+    if (!reduce) {
+      gsap.set(lines.flatMap((l) => [...l.querySelectorAll('.ch')]), { opacity: 0, y: 70, filter: 'blur(16px)', rotate: 6 });
+      gsap.set(art, { opacity: 0, scale: 0.7 });
+      gsap.set(plane, { opacity: 0 });
+    }
+    whenIntro(() => {
+      document.documentElement.classList.add('hero-in');
+      if (reduce) return;
+      const tl = gsap.timeline();
+      tl.to(plane, { opacity: 1, duration: 1.8, ease: 'power2.out' }, 0)
+        .to(art, { opacity: 1, scale: 1, duration: 1.8, ease: 'expo.out' }, 0.15);
+      lines.forEach((l, i) => {
+        tl.to(l.querySelectorAll('.ch'), {
+          opacity: 1, y: 0, filter: 'blur(0px)', rotate: 0,
+          duration: 1.2, ease: 'expo.out', stagger: 0.035,
+        }, 0.25 + i * 0.25);
+      });
+      /* ---- Hero scroll: the wall unfolds, title flies apart ---- */
+      const htl = gsap.timeline({
+      scrollTrigger: { trigger: hero, start: 'top top', end: '+=110%', scrub: 0.6, pin: true },
+    });
+      htl.fromTo(plane, { rotateX: 52, rotateZ: -32, scale: 1, xPercent: -50, yPercent: -50 }, { rotateX: 16, rotateZ: -6, scale: 1.5, xPercent: -50, yPercent: -50, ease: 'none' }, 0)
+      .to(lines[0], { xPercent: -30, autoAlpha: 0, ease: 'none' }, 0)
+      .to(lines[1], { xPercent: 30, autoAlpha: 0, ease: 'none' }, 0)
+      .fromTo(art, { scale: 1, autoAlpha: 1 }, { scale: 1.8, autoAlpha: 0, ease: 'none', immediateRender: false }, 0)
+      .to(hero.querySelectorAll('.hx__roles, .hx__foot'), { autoAlpha: 0, y: -40, ease: 'none' }, 0)
+      .to(hero.querySelector('.hx__shade'), { opacity: 0.5, ease: 'none' }, 0)
+      .to(hero.querySelector('.hx__wall'), { opacity: 0.2, ease: 'none' }, 0.55);
+      // the pin was added after the others: recalculate positions top-to-bottom
+      ScrollTrigger.sort();
+      ScrollTrigger.refresh();
+    });
+
+    if (reduce) return;
+
+    // cursor parallax on the wall & logo
+    hero.addEventListener('pointermove', (e) => {
+      const x = e.clientX / innerWidth - 0.5, y = e.clientY / innerHeight - 0.5;
+      gsap.to(hero.querySelector('.hx__wall'), { x: x * -40, y: y * -30, duration: 1.4, ease: 'power3.out' });
+      gsap.to(art.querySelector('.media'), { x: x * 30, y: y * 20, rotateY: x * 12, rotateX: -y * 10, duration: 1.2, ease: 'power3.out' });
+    });
+
+    /* ---- About photo opens up ---- */
+    const photo = document.querySelector<HTMLElement>('[data-about-photo]');
+    if (photo) {
+      gsap.to(photo, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none', scrollTrigger: { trigger: photo, start: 'top 90%', end: 'center 45%', scrub: true } });
+      gsap.to(photo.querySelector('img'), { scale: 1, ease: 'none', scrollTrigger: { trigger: photo, start: 'top 90%', end: 'bottom 30%', scrub: true } });
+    }
+
+    const mm = gsap.matchMedia();
+
+    /* ---- Work: pinned list, image clusters swap with scroll ---- */
+    const work = document.querySelector<HTMLElement>('[data-work]');
+    mm.add('(min-width: 861px)', () => {
+      if (!work) return;
+      const items = [...work.querySelectorAll<HTMLElement>('[data-work-item]')];
+      const clusters = [...work.querySelectorAll<HTMLElement>('[data-work-cluster]')];
+      const idxEl = work.querySelector<HTMLElement>('[data-work-idx]')!;
+      const bar = work.querySelector<HTMLElement>('[data-work-bar]')!;
+      const n = items.length;
+      let current = -1;
+      const show = (i: number) => {
+        if (i === current) return;
+        const prev = clusters[current];
+        current = i;
+        items.forEach((it, k) => it.classList.toggle('is-active', k === i));
+        idxEl.textContent = String(i + 1).padStart(2, '0');
+        if (prev) {
+          prev.classList.remove('is-active');
+          gsap.to(prev.querySelectorAll('.wk__img'), { autoAlpha: 0, scale: 0.85, y: -60, filter: 'blur(10px)', duration: 0.5, ease: 'power3.in', stagger: 0.03, overwrite: true });
+        }
+        const next = clusters[i];
+        next.classList.add('is-active');
+        gsap.fromTo(next.querySelectorAll('.wk__img'),
+          { autoAlpha: 0, scale: 1.15, y: 90, rotate: () => gsap.utils.random(-8, 8), filter: 'blur(14px)' },
+          { autoAlpha: 1, scale: 1, y: 0, rotate: 0, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out', stagger: 0.06, delay: prev ? 0.2 : 0, overwrite: true });
+      };
+      gsap.set(clusters.flatMap((c) => [...c.querySelectorAll('.wk__img')]), { autoAlpha: 0 });
+      show(0);
+      ScrollTrigger.create({
+        trigger: work.querySelector('[data-work-pin]'),
+        start: 'top top',
+        end: `+=${n * 75}%`,
+        pin: true,
+        onUpdate: (self) => {
+          bar.style.transform = `scaleX(${self.progress})`;
+          show(Math.min(n - 1, Math.floor(self.progress * n)));
+        },
+      });
+      // gentle floating
+      clusters.forEach((c) => c.querySelectorAll('.wk__img .media').forEach((im, k) => {
+        gsap.to(im, { yPercent: k % 2 ? 3 : -3, duration: 3 + k * 0.4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      }));
+    });
+
+    /* ---- Reel: vertical scroll drives the horizontal track ---- */
+    const reel = document.querySelector<HTMLElement>('[data-reel]');
+    mm.add('(min-width: 861px)', () => {
+      if (!reel) return;
+      const track = reel.querySelector<HTMLElement>('[data-reel-track]')!;
+      const dist = () => track.scrollWidth - innerWidth;
+      const tween = gsap.to(track, {
+        x: () => -dist(),
+        ease: 'none',
+        scrollTrigger: { trigger: reel, start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: 0.8, invalidateOnRefresh: true },
+      });
+      reel.querySelectorAll<HTMLElement>('[data-reel-img] img').forEach((im) => {
+        gsap.fromTo(im, { xPercent: -7 }, { xPercent: 7, ease: 'none', scrollTrigger: { trigger: im.closest('figure'), containerAnimation: tween, start: 'left right', end: 'right left', scrub: true } });
+      });
+    });
+
+    /* ---- Testimonials: previous card shrinks as the next stacks on top ---- */
+    const cards = gsap.utils.toArray<HTMLElement>('[data-ts-card]');
+    cards.forEach((card, i) => {
+      if (i === cards.length - 1) return;
+      gsap.to(card, {
+        scale: 0.94 - (cards.length - i) * 0.01, ease: 'none',
+        scrollTrigger: { trigger: cards[i + 1], start: 'top bottom', end: 'top 30%', scrub: true },
+      });
+    });
+  });
+</script>

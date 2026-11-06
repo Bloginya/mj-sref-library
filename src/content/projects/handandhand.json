@@ -1,0 +1,146 @@
+{
+  "name": "Hand and Hand",
+  "order": 3,
+  "cover": "/src/assets/images/projects/handandhand/cover.webp",
+  "seoTitle": "Hand in Hand × AI — Island Mimosa Campaign",
+  "seoDescription": "A complete AI-generated advertising campaign for Hand in Hand's Foaming Shave Cream line — built from two product images. AI models, scenes and banners by Darya Kruk.",
+  "sections": [
+    {
+      "discriminant": "hero",
+      "value": {
+        "background": "pink",
+        "backgroundImage": null,
+        "eyebrow": "",
+        "title": "Hand in Hand × AI\n— Island Mimosa Campaign",
+        "subtitle": "AI Creative Production & Campaign",
+        "align": "center"
+      }
+    },
+    {
+      "discriminant": "feature",
+      "value": {
+        "background": "pink",
+        "label": "",
+        "title": "Project _Overview_",
+        "body": "A complete AI-generated advertising campaign for ((Hand in Hand's Foaming Shave Cream)) line — built entirely from two product reference images. Starting with nothing but the physical packaging, the entire visual world was constructed from scratch: the models, the environments, the mood, the messaging. The output is a campaign that looks and feels like a full production shoot — sunny, inclusive, and conversion-ready.\n\nThe brief was clear: captivate and convert. The answer was a tropical universe of foam, light, and joyful skin — designed to sell.",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/handandhand/advertisment-digital-banner-202604141420.webp",
+            "alt": "Fresh. Foamy. Unstoppable. — campaign banner"
+          },
+          {
+            "image": "/src/assets/images/projects/handandhand/product-photo-with-202604021852.webp",
+            "alt": "Product photo"
+          }
+        ],
+        "video": null,
+        "mediaPosition": "right",
+        "layout": "collage"
+      }
+    },
+    {
+      "discriminant": "feature",
+      "value": {
+        "background": "white",
+        "label": "",
+        "title": "_AI Models Creation_",
+        "body": "A diverse, inclusive cast of AI-generated models was created to reflect Hand in Hand's brand values. Each model was designed with distinct features, skin tones, and energy — a pink-haired woman mid-laugh in foam-filled light, a man confidently working the product into his face, a close-up of smooth legs in a tropical setting. Every face and body built specifically for this campaign.",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/handandhand/prompt-character-202604141316.webp",
+            "alt": "Character sheet — male model"
+          },
+          {
+            "image": "/src/assets/images/projects/handandhand/editorial-fashion-photography-2026041413.webp",
+            "alt": "Model with foam"
+          },
+          {
+            "image": "/src/assets/images/projects/handandhand/prompt-character-202604141311.webp",
+            "alt": "Character sheet — pink-haired model"
+          }
+        ],
+        "video": null,
+        "mediaPosition": "left",
+        "layout": "collage"
+      }
+    },
+    {
+      "discriminant": "feature",
+      "value": {
+        "background": "white",
+        "label": "",
+        "title": "_Starting Point — 2 Product Images_",
+        "body": "The entire campaign was generated from two source images of the physical products: the Island Mimosa (yellow) and Cactus Blossom (pink) foaming shave creams.\n\nNo existing photography. No shoot. Just the bottle — and a creative direction built around it.",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/handandhand/shave-cream-8oz-im-fs.webp",
+            "alt": "Island Mimosa — original product photo"
+          },
+          {
+            "image": "/src/assets/images/projects/handandhand/shave-cream-8oz-cb-fs-1000x.webp",
+            "alt": "Cactus Blossom — original product photo"
+          },
+          {
+            "image": "/src/assets/images/projects/handandhand/model-with-fake-202604141328.webp",
+            "alt": "Model with foam beard"
+          },
+          {
+            "image": "/src/assets/images/projects/handandhand/editorial-fashion-photography-2026041413-2.webp",
+            "alt": "Model portrait"
+          }
+        ],
+        "video": null,
+        "mediaPosition": "right",
+        "layout": "grid"
+      }
+    },
+    {
+      "discriminant": "feature",
+      "value": {
+        "background": "white",
+        "label": "",
+        "title": "_Scene & Environment Design_",
+        "body": "Tropical backgrounds — open skies, floral flatlay surfaces, golden light — were constructed to complement the product's Island Mimosa scent story. The hero shot features an iridescent holographic product display with floating feature callouts (Moisturizing · 100% Vegan · No Parabens), creating a bold, scroll-stopping centrepiece for digital and static banner use.",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/handandhand/product-photo-with-202604021908.webp",
+            "alt": "Holographic product display"
+          },
+          {
+            "image": "/src/assets/images/projects/handandhand/ezgif-470aef3c76f97f0c.gif",
+            "alt": "Animated banner"
+          },
+          {
+            "image": "/src/assets/images/projects/handandhand/virtual-models-in-a-bright-top-down-pers.webp",
+            "alt": "Top-down lifestyle shot"
+          }
+        ],
+        "video": null,
+        "mediaPosition": "left",
+        "layout": "collage"
+      }
+    },
+    {
+      "discriminant": "feature",
+      "value": {
+        "background": "white",
+        "label": "",
+        "title": "_Campaign Production_",
+        "body": "Static and animated banner assets were produced across multiple formats for digital advertising. Each asset was designed to communicate brand values — vegan, cruelty-free, made in USA — while maintaining visual energy and warmth across the full creative suite.\n\n**Deliverables** Static banners · Animated banners · Hero product visuals · Lifestyle campaign imagery\n\n**Scope** Art direction · AI model creation · Scene generation · Product visualisation · Campaign production\n\n**Brand** Hand in Hand — 100% Vegan & Cruelty Free · Made in USA",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/handandhand/advertisment-banner-with-202604141356.webp",
+            "alt": "Find your foam — campaign banner"
+          },
+          {
+            "image": "/src/assets/images/projects/handandhand/advertisment-banner-with-202604141357.webp",
+            "alt": "Foaming shave cream banner"
+          }
+        ],
+        "video": null,
+        "mediaPosition": "right",
+        "layout": "grid"
+      }
+    }
+  ]
+}

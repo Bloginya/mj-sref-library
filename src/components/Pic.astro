@@ -1,0 +1,43 @@
+---
+import { Image, getImage } from 'astro:assets';
+import { img, isGif } from '../lib/content';
+interface Props {
+  src?: string | null;
+  alt?: string;
+  sizes?: string;
+  class?: string;
+  zoom?: string | false; // lightbox group name
+  eager?: boolean;
+  reveal?: string | false;
+  style?: string;
+  fit?: 'cover' | 'contain';
+}
+const { src, alt = '', sizes = '(max-width: 800px) 100vw, 50vw', class: cls = '', zoom = false, eager = false, reveal = 'wipe', style, fit = 'cover' } = Astro.props;
+const meta = img(src);
+const gif = isGif(src);
+const widths = meta ? [480, 800, 1200, 1600, 2200].filter((w) => w <= meta.width).concat(meta.width < 480 ? [meta.width] : []) : [];
+const full = meta && zoom && !gif ? await getImage({ src: meta, width: Math.min(meta.width, 2400), format: 'webp' }) : undefined;
+---
+{meta && (
+  <figure
+    class:list={['media', cls, { zoomable: zoom }]}
+    style={style}
+    data-reveal={reveal || undefined}
+    data-zoom={zoom ? '' : undefined}
+    data-group={zoom || undefined}
+    data-full={zoom ? (gif ? meta.src : full?.src) : undefined}
+    tabindex={zoom ? 0 : undefined}
+    role={zoom ? 'button' : undefined}
+    aria-label={zoom ? `Open image: ${alt || 'image'}` : undefined}
+  >
+    {gif ? (
+      <img src={meta.src} width={meta.width} height={meta.height} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" style={`object-fit:${fit}`} />
+    ) : (
+      <Image src={meta} alt={alt} widths={widths} sizes={sizes} format="webp" quality={82} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} style={`object-fit:${fit}`} />
+    )}
+  </figure>
+)}
+<style>
+  figure { margin: 0; }
+  figure :global(picture) { display: contents; }
+</style>

@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import Sections from '../../components/Sections.astro';
+import Contact from '../../components/Contact.astro';
+import Icon from '../../components/Icons.astro';
+import { getProjects, getSettings } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((p, i) => ({
+    params: { slug: p.slug },
+    props: { project: p, prev: projects[i - 1] ?? null, next: projects[i + 1] ?? null },
+  }));
+}
+const { project, prev, next } = Astro.props;
+const settings = await getSettings();
+---
+<Base title={project.seoTitle || project.name} description={project.seoDescription || undefined} image={project.cover}>
+  <Sections sections={project.sections} slug={project.slug} />
+  <Contact settings={settings} title="Get in touch." titleItalic="" />
+  <nav class="pnav theme-black" aria-label="More projects">
+    <div class="wrap pnav__inner">
+      {prev ? <a href={`/portfolio/${prev.slug}`} class="pnav__link pnav__prev"><Icon name="left" size={26} /><span>{prev.name}</span></a> : <span />}
+      {next ? <a href={`/portfolio/${next.slug}`} class="pnav__link pnav__next"><span>{next.name}</span><Icon name="right" size={26} /></a> : <span />}
+    </div>
+  </nav>
+</Base>
+
+<style>
+  .pnav { border-top: 1px solid rgba(255, 255, 255, 0.12); }
+  .pnav__inner { display: flex; justify-content: space-between; padding-block: 36px; }
+  .pnav__link { display: inline-flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: clamp(22px, 3vw, 40px); text-transform: uppercase; text-decoration: none; }
+  .pnav__link :global(svg) { transition: transform 0.5s var(--ease-out); }
+  .pnav__prev:hover :global(svg) { transform: translateX(-8px); }
+  .pnav__next:hover :global(svg) { transform: translateX(8px); }
+</style>

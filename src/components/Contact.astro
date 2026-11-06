@@ -1,0 +1,104 @@
+---
+import { inline } from '../lib/text';
+interface Props { settings: any; title?: string; titleItalic?: string; text?: string; theme?: string }
+const { settings, theme = 'black' } = Astro.props;
+const title = Astro.props.title ?? settings.contactTitle;
+const titleItalic = Astro.props.titleItalic ?? settings.contactTitleItalic;
+const text = Astro.props.text ?? settings.contactText;
+const key = settings.formAccessKey;
+const email = settings.email;
+---
+<section id="contact" class:list={['contact section', `theme-${theme}`]}>
+  <div class="wrap contact__grid">
+    <div class="contact__intro">
+      <h2 class="h-lg" data-split>{title}</h2>
+      {titleItalic && <h2 class="h-lg" data-split style="--d:2"><em>{titleItalic}</em></h2>}
+      {text && <p class="contact__text" data-reveal style="--d:3" set:html={inline(text)} />}
+      {email && <p class="contact__mail" data-reveal style="--d:4"><a href={`mailto:${email}`}>{email}</a></p>}
+    </div>
+
+    <form class="contact__form" data-contact-form data-reveal style="--d:2"
+      action={key ? 'https://api.web3forms.com/submit' : email ? `mailto:${email}` : undefined}
+      method="POST" enctype={key ? undefined : 'text/plain'}>
+      {key && <input type="hidden" name="access_key" value={key} />}
+      <input type="hidden" name="from_name" value="daryakruk.ai" />
+      <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" autocomplete="off" />
+      <div class="row">
+        <label class="field"><span>First name *</span><input name="first_name" required autocomplete="given-name" /></label>
+        <label class="field"><span>Last name *</span><input name="last_name" required autocomplete="family-name" /></label>
+      </div>
+      <label class="field"><span>Email *</span><input type="email" name="email" required autocomplete="email" /></label>
+      <label class="field"><span>Subject *</span><input name="subject" required /></label>
+      <label class="field"><span>Message *</span><textarea name="message" rows="5" required></textarea></label>
+      <button type="submit" class="btn">Send <span aria-hidden="true">➺</span></button>
+      <p class="contact__status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<style>
+  .contact__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 120px); align-items: start; }
+  .contact__intro h2 + h2 { margin-top: 0.15em; }
+  .contact__text { margin-top: 28px; max-width: 42ch; font-size: 16px; opacity: 0.9; }
+  .contact__mail a { font-size: 18px; text-underline-offset: 4px; }
+  .contact__form { display: grid; gap: 18px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .field { display: grid; gap: 8px; font-size: 13px; letter-spacing: 0.02em; }
+  .field input, .field textarea {
+    width: 100%;
+    padding: 14px 0;
+    font: inherit;
+    font-size: 16px;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid currentColor;
+    border-radius: 0;
+    outline: none;
+    transition: border-color 0.3s, padding 0.3s var(--ease-out);
+    resize: vertical;
+  }
+  .field input:focus, .field textarea:focus { border-bottom-color: var(--accent); padding-left: 8px; }
+  .contact__form .btn { justify-self: start; margin-top: 8px; }
+  .contact__status { min-height: 1.4em; font-size: 14px; margin: 0; }
+  .contact__status.ok { color: #9be89b; }
+  .contact__status.err { color: #ff9b9b; }
+  @media (max-width: 860px) {
+    .contact__grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) { .row { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+    const action = form.getAttribute('action') || '';
+    if (!action.includes('web3forms')) return; // mailto / not configured: let the browser handle it
+    const status = form.querySelector<HTMLElement>('.contact__status')!;
+    const btn = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      status.className = 'contact__status';
+      status.textContent = 'Sending…';
+      try {
+        const data = Object.fromEntries(new FormData(form));
+        (data as any).name = `${data.first_name} ${data.last_name}`.trim();
+        const res = await fetch(action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message);
+        form.reset();
+        status.classList.add('ok');
+        status.textContent = 'Thank you! Your message has been sent — I’ll get back to you soon.';
+      } catch {
+        status.classList.add('err');
+        status.textContent = 'Something went wrong. Please try again or write me directly.';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+</script>

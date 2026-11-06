@@ -1,0 +1,59 @@
+---
+import Logo from './Logo.astro';
+---
+<div class="preloader" data-preloader transition:persist aria-hidden="true">
+  <div class="preloader__logo"><Logo class="logo-svg" label="" /></div>
+  <div class="preloader__count"><span data-pl-count>0</span></div>
+  <div class="preloader__bar"><span data-pl-bar></span></div>
+</div>
+<script is:inline>
+  // Show the intro only on the first visit of a session
+  (function () {
+    var seen = false;
+    try { seen = sessionStorage.getItem('dk-intro') === '1'; } catch (e) {}
+    if (seen || matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('intro-done');
+  })();
+</script>
+<style>
+  .preloader {
+    position: fixed; inset: 0; z-index: 500;
+    background: #000; color: #fff;
+    display: grid; place-items: center;
+  }
+  :global(.intro-done) .preloader { display: none; }
+  .preloader__logo { width: clamp(80px, 9vw, 130px); }
+  .preloader__logo :global(.logo-svg) { width: 100%; height: auto; }
+  .preloader__logo :global(path) { opacity: 0; }
+  .preloader__count {
+    position: absolute; right: var(--gutter); bottom: calc(var(--gutter) + 6px);
+    font-family: var(--font-display); font-size: clamp(64px, 14vw, 220px); line-height: 0.8;
+  }
+  .preloader__bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; }
+  .preloader__bar span { display: block; height: 100%; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+</style>
+<script>
+  import { gsap } from '../scripts/motion';
+  const pl = document.querySelector<HTMLElement>('[data-preloader]');
+  const done = () => {
+    document.documentElement.classList.add('intro-done');
+    try { sessionStorage.setItem('dk-intro', '1'); } catch {}
+    (window as any).__introDone = true;
+    window.dispatchEvent(new Event('intro:done'));
+  };
+  if (!pl || document.documentElement.classList.contains('intro-done')) {
+    (window as any).__introDone = true;
+  } else {
+    const count = pl.querySelector<HTMLElement>('[data-pl-count]')!;
+    const bar = pl.querySelector<HTMLElement>('[data-pl-bar]')!;
+    const paths = pl.querySelectorAll('path');
+    const o = { v: 0 };
+    const tl = gsap.timeline({ onComplete: done });
+    tl.to(paths, { opacity: 1, duration: 0.5, ease: 'power2.out' })
+      .fromTo(pl.querySelector('.preloader__logo'), { scale: 0.6, rotate: -20 }, { scale: 1, rotate: 0, duration: 1.4, ease: 'expo.out' }, 0)
+      .to(o, { v: 100, duration: 1.6, ease: 'power2.inOut', onUpdate: () => { count.textContent = String(Math.round(o.v)); } }, 0)
+      .to(bar, { scaleX: 1, duration: 1.6, ease: 'power2.inOut' }, 0)
+      .to(pl.querySelector('.preloader__logo'), { scale: 18, opacity: 0, duration: 0.9, ease: 'expo.in' }, '>-0.1')
+      .to(count, { yPercent: 100, opacity: 0, duration: 0.5, ease: 'power3.in' }, '<')
+      .to(pl, { clipPath: 'inset(0 0 100% 0)', duration: 0.9, ease: 'expo.inOut' }, '>-0.35');
+  }
+</script>

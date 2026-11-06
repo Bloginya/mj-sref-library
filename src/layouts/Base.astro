@@ -1,0 +1,62 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+import { getImage } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Lightbox from '../components/Lightbox.astro';
+import Preloader from '../components/Preloader.astro';
+import { getSettings, img } from '../lib/content';
+import faviconDark from '../assets/images/site/favicon-dark.png';
+import faviconLight from '../assets/images/site/favicon-light.png';
+
+interface Props { title?: string; description?: string; image?: string | null }
+const settings = await getSettings();
+const { title, description = settings.description, image } = Astro.props;
+const fullTitle = title ? `${title} — Darya Kruk` : settings.siteTitle;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogSrc = img(image) || img(settings.ogImage);
+const og = ogSrc ? await getImage({ src: ogSrc, width: 1200, height: 630, fit: 'cover', format: 'jpg' }) : undefined;
+const iconDark = await getImage({ src: faviconDark, width: 96, format: 'png' });
+const iconLight = await getImage({ src: faviconLight, width: 96, format: 'png' });
+const appleIcon = await getImage({ src: faviconDark, width: 180, format: 'png' });
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/png" href={iconLight.src} media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" href={iconDark.src} media="(prefers-color-scheme: dark)" />
+    <link rel="apple-touch-icon" href={appleIcon.src} />
+    <meta name="theme-color" content="#000000" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Darya Kruk" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {og && <meta property="og:image" content={new URL(og.src, Astro.site)} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <ClientRouter />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+  </head>
+  <body>
+    <Preloader />
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Header settings={settings} current={Astro.url.pathname} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer settings={settings} />
+    <Lightbox />
+    <script>
+      import '../scripts/motion';
+      import { initPage } from '../scripts/animations';
+      document.addEventListener('astro:page-load', initPage);
+    </script>
+  </body>
+</html>

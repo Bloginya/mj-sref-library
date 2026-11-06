@@ -1,0 +1,46 @@
+---
+interface Props { items: string[]; style?: 'small' | 'big'; theme?: string; speed?: number; reverse?: boolean }
+const { items = [], style = 'small', theme = 'black', speed, reverse = false } = Astro.props;
+const list = items.filter(Boolean);
+// repeat so one track is always wider than the screen
+const reps = Math.max(2, Math.ceil(12 / Math.max(list.length, 1)));
+const track = Array.from({ length: reps }, () => list).flat();
+const duration = speed ?? Math.max(18, track.length * (style === 'big' ? 2.6 : 2.2));
+---
+{list.length > 0 && (
+  <div class:list={['marquee', `marquee--${style}`, `theme-${theme}`, { 'marquee--reverse': reverse }]} style={`--dur:${duration}s`} aria-label={list.join(', ')} role="marquee">
+    {[0, 1].map((n) => (
+      <div class="marquee__track" aria-hidden={n === 1 ? 'true' : undefined}>
+        {track.map((t) => (<><span class="marquee__item">{t}</span><span class="marquee__sep">✦</span></>))}
+      </div>
+    ))}
+  </div>
+)}
+
+<style>
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    user-select: none;
+    white-space: nowrap;
+    padding-block: 10px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .marquee__track {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    animation: marquee var(--dur) linear infinite;
+  }
+  .marquee--reverse .marquee__track { animation-direction: reverse; }
+  .marquee:hover .marquee__track { animation-play-state: paused; }
+  .marquee__item { text-transform: uppercase; }
+  .marquee--small { font-size: 14px; font-weight: 500; letter-spacing: 0.02em; }
+  .marquee--small .marquee__item, .marquee--small .marquee__sep { padding-inline: 18px; }
+  .marquee--big { font-family: var(--font-display); font-size: clamp(22px, 2.4vw, 34px); padding-block: 14px; }
+  .marquee--big .marquee__item { padding-inline: 14px; }
+  .marquee--big .marquee__sep { font-size: 0.6em; padding-inline: 6px; }
+  @keyframes marquee { to { transform: translateX(-100%); } }
+  @media (prefers-reduced-motion: reduce) { .marquee__track { animation-duration: calc(var(--dur) * 4); } }
+</style>

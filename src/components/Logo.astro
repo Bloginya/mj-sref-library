@@ -1,0 +1,8 @@
+---
+import raw from './logo.svg?raw';
+interface Props { class?: string; label?: string }
+const { class: cls = '', label = 'Darya Kruk' } = Astro.props;
+// Inline the vector logo so it inherits the text colour and stays crisp.
+const svg = raw.replace('<svg', `<svg aria-hidden="true" focusable="false" class="${cls}"`);
+---
+<Fragment set:html={svg} /><span class="sr-only">{label}</span>

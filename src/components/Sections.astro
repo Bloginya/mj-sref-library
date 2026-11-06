@@ -1,0 +1,356 @@
+---
+import Pic from './Pic.astro';
+import Marquee from './Marquee.astro';
+import Icon from './Icons.astro';
+import { img } from '../lib/content';
+import { inline, paragraphs } from '../lib/text';
+import { getImage } from 'astro:assets';
+
+interface Props { sections: any[]; slug: string }
+const { sections = [], slug } = Astro.props;
+
+const bgUrl = async (path?: string | null) => {
+  const m = img(path);
+  if (!m) return undefined;
+  const o = await getImage({ src: m, width: 2000, format: 'webp' });
+  return o.src;
+};
+
+// Pre-resolve background images
+const resolved = await Promise.all(
+  sections.map(async (s, i) => ({
+    i,
+    type: s.discriminant as string,
+    v: s.value as any,
+    bg: s.value?.backgroundImage ? await bgUrl(s.value.backgroundImage) : undefined,
+  })),
+);
+---
+{resolved.map(({ i, type, v, bg }) => {
+  const theme = `theme-${v.background || 'black'}`;
+  const group = `${slug}-${i}`;
+
+  /* ---------------- HERO ---------------- */
+  if (type === 'hero') return (
+    <section class:list={['b-hero', theme, `b-hero--${v.align}`, { 'has-bg': bg }]}>
+      {bg && <div class="b-hero__bg" style={`background-image:url(${bg})`} data-parallax="0.15" />}
+      <div class="wrap b-hero__inner">
+        {v.eyebrow && <p class="b-hero__eyebrow h-sm" data-reveal>{v.eyebrow}</p>}
+        <h1 class="h-lg b-hero__title" data-blur-chars data-now data-delay="0.2" set:html={inline(v.title)} />
+        {v.subtitle && <p class="b-hero__sub h-sm" data-reveal style="--d:3" set:html={inline(v.subtitle)} />}
+      </div>
+    </section>
+  );
+
+  /* ---------------- VIDEO ---------------- */
+  if (type === 'video') {
+    const poster = img(v.poster);
+    return (
+      <section class:list={['b-video', theme]}>
+        <div class:list={['wrap', `b-video--${v.size}`]}>
+          <div class="b-video__frame" data-reveal="scale" data-video-player>
+            {v.autoplay ? (
+              <video src={v.video} poster={poster?.src} muted loop playsinline preload="metadata" data-autoplay />
+            ) : (
+              <>
+                <video src={v.video} poster={poster?.src} playsinline preload="none" />
+                <button class="b-video__play" data-play aria-label="Play video"><span><Icon name="play" size={30} /></span></button>
+              </>
+            )}
+          </div>
+          {v.caption && <p class="b-video__cap">{v.caption}</p>}
+        </div>
+      </section>
+    );
+  }
+
+  /* ---------------- TEXT ---------------- */
+  if (type === 'text') return (
+    <section class:list={['b-text section', theme, `b-text--${v.align}`, `b-text--${v.size}`]}>
+      <div class="wrap b-text__inner">
+        {v.heading && <h2 class:list={[v.size === 'statement' ? 'h-lg' : 'h-sm']} data-split set:html={inline(v.heading)} />}
+        {v.body && (v.size === 'statement'
+          ? <p class="h-md b-text__statement" data-reveal style="--d:2" set:html={inline(v.body)} />
+          : <div class="b-text__body" data-reveal style="--d:2" set:html={paragraphs(v.body)} />)}
+      </div>
+    </section>
+  );
+
+  /* ---------------- MARQUEE ---------------- */
+  if (type === 'marquee') return <Marquee items={v.items} style={v.style} theme={v.background} />;
+
+  /* ---------------- FEATURE / STEP ---------------- */
+  if (type === 'feature') {
+    const imgs = (v.images || []).filter((x: any) => x.image);
+    return (
+      <section class:list={['b-feat section', theme, `b-feat--media-${v.mediaPosition}`, `b-feat--${v.layout}`, { 'b-feat--no-media': !imgs.length && !v.video }]}>
+        <div class="wrap b-feat__grid">
+          <div class="b-feat__text">
+            <h2 class="h-lg" data-split>
+              {v.label && <><em class="b-feat__label">{v.label}</em><br /></>}
+              <Fragment set:html={inline(v.title)} />
+            </h2>
+            {v.body && <div class="b-feat__body" data-reveal style="--d:2" set:html={paragraphs(v.body)} />}
+            {v.video && (
+              <div class="b-feat__clip" data-reveal="scale" style="--d:3">
+                <video src={v.video} muted loop playsinline preload="metadata" data-autoplay />
+              </div>
+            )}
+          </div>
+          {imgs.length > 0 && (
+            <div class:list={['b-feat__media', `n-${Math.min(imgs.length, 7)}`]}>
+              {imgs.map((x: any, k: number) => (
+                <Pic src={x.image} alt={x.alt} zoom={group} class={`m m${k + 1}`} style={`--d:${k}`}
+                  sizes={k === 0 && v.layout === 'collage' ? '(max-width: 800px) 100vw, 50vw' : '(max-width: 800px) 50vw, 25vw'} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  /* ---------------- GALLERY ---------------- */
+  if (type === 'gallery') {
+    const imgs = (v.images || []).filter((x: any) => x.image);
+    return (
+      <section class:list={['b-gal section', theme, `b-gal--${v.style}`]}>
+        <div class:list={[v.style === 'carousel' ? 'b-gal__full' : 'wrap']}>
+          {v.heading && <h2 class="h-md b-gal__heading" data-split set:html={inline(v.heading)} />}
+          {v.style === 'carousel' ? (
+            <div class="carousel" data-carousel>
+              <div class="carousel__track" data-track tabindex="0" aria-label="Image carousel">
+                {imgs.map((x: any) => <Pic src={x.image} alt={x.alt} zoom={group} reveal={false} class="carousel__item" sizes="(max-width: 800px) 80vw, 30vw" />)}
+              </div>
+              <button class="carousel__btn carousel__prev" data-prev aria-label="Previous"><Icon name="left" size={26} /></button>
+              <button class="carousel__btn carousel__next" data-next aria-label="Next"><Icon name="right" size={26} /></button>
+            </div>
+          ) : (
+            <div class:list={['b-gal__grid', `n-${Math.min(imgs.length, 6)}`]}>
+              {imgs.map((x: any, k: number) => (
+                <Pic src={x.image} alt={x.alt} zoom={group} class={`g g${k + 1}`} style={`--d:${k % 4}`}
+                  fit={v.style === 'stack' || v.style === 'masonry' ? 'contain' : 'cover'}
+                  sizes={v.style === 'stack' ? '(max-width: 1440px) 100vw, 1440px' : k === 0 && v.style === 'editorial' ? '(max-width: 800px) 100vw, 50vw' : '(max-width: 800px) 100vw, 33vw'} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  /* ---------------- SINGLE IMAGE ---------------- */
+  if (type === 'image') return (
+    <section class:list={['b-img section', theme, `b-img--${v.size}`]}>
+      <div class:list={[v.size === 'bleed' ? '' : 'wrap']}>
+        <Pic src={v.image} alt={v.alt} zoom={group} fit="contain" sizes={v.size === 'medium' ? '(max-width: 800px) 100vw, 900px' : '100vw'} />
+        {v.caption && <p class="b-img__cap">{v.caption}</p>}
+      </div>
+    </section>
+  );
+
+  /* ---------------- STATEMENT + FLOATING IMAGES ---------------- */
+  if (type === 'collage') {
+    const imgs = (v.images || []).filter((x: any) => x.image).slice(0, 7);
+    return (
+      <section class:list={['b-col', theme, { 'has-bg': bg }]}>
+        {bg && <div class="b-col__bg" style={`background-image:url(${bg})`} />}
+        <div class="wrap b-col__stage">
+          <h2 class="h-lg b-col__text" data-split set:html={inline(v.text)} />
+          {imgs.map((x: any, k: number) => (
+            <div class={`b-col__float f${k + 1}`} data-parallax={[0.12, -0.08, 0.18, -0.14, 0.06, -0.1, 0.15][k]}>
+              <Pic src={x.image} alt={x.alt} zoom={group} reveal="scale" style={`--d:${k}`} sizes="(max-width: 800px) 45vw, 30vw" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  /* ---------------- DETAILS ---------------- */
+  if (type === 'details') return (
+    <section class:list={['b-det section', theme]}>
+      <div class="wrap b-det__grid">
+        {v.intro && <div class="b-det__intro" data-reveal set:html={paragraphs(v.intro)} />}
+        {v.items?.length > 0 && (
+          <dl class="b-det__card" data-reveal style="--d:2">
+            {v.items.map((it: any) => (<div><dt>{it.label}</dt><dd set:html={inline(it.text)} /></div>))}
+          </dl>
+        )}
+      </div>
+    </section>
+  );
+
+  return null;
+})}
+
+<style>
+  /* HERO */
+  .b-hero { position: relative; overflow: hidden; padding: calc(var(--header-h) + clamp(40px, 7vw, 100px)) 0 clamp(36px, 4vw, 56px); }
+  .b-hero--center { text-align: center; }
+  .b-hero__inner { position: relative; z-index: 1; }
+  .b-hero__title { max-width: 18ch; margin-inline: auto; }
+  .b-hero--left .b-hero__title { margin-inline: 0; }
+  .b-hero__eyebrow { margin: 0 0 0.3em; }
+  .b-hero__sub { margin: 0.7em auto 0; max-width: 28ch; }
+  .b-hero--left .b-hero__sub { margin-inline: 0; }
+  .b-hero.has-bg { min-height: min(86svh, 760px); display: flex; align-items: flex-end; color: var(--white); }
+  .b-hero__bg { position: absolute; inset: -12% 0; background-size: cover; background-position: center; }
+  .b-hero.has-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.75), rgba(0,0,0,0.05) 60%); }
+
+  /* VIDEO */
+  .b-video { padding-block: clamp(12px, 2vw, 24px); }
+  .b-video--medium { max-width: 1000px; }
+  .b-video__frame { position: relative; aspect-ratio: 16 / 9; background: #111; overflow: hidden; }
+  .b-video__frame video { width: 100%; height: 100%; object-fit: cover; }
+  .b-video__play {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    background: linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,0.25)); border: 0; color: #fff; cursor: pointer;
+    transition: opacity 0.4s;
+  }
+  .b-video__play span {
+    display: grid; place-items: center; width: 96px; height: 96px; border-radius: 50%;
+    background: rgba(255,255,255,0.14); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.4);
+    transition: transform 0.6s var(--ease-out), background 0.4s;
+  }
+  .b-video__play:hover span { transform: scale(1.12); background: rgba(255,255,255,0.28); }
+  .is-playing .b-video__play { opacity: 0; pointer-events: none; }
+  .b-video__cap { font-size: 13px; margin-top: 12px; opacity: 0.8; }
+
+  /* TEXT */
+  .b-text__inner { max-width: 920px; }
+  .b-text--center .b-text__inner { margin-inline: auto; text-align: center; }
+  .b-text__body { margin-top: 1.1em; font-size: 15.5px; max-width: 70ch; }
+  .b-text--center .b-text__body { margin-inline: auto; }
+  .b-text__statement { margin-top: 0.6em; }
+
+  /* FEATURE */
+  .b-feat__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 80px); align-items: start; }
+  .b-feat--media-left .b-feat__text { order: 2; }
+  .b-feat--no-media .b-feat__grid { grid-template-columns: minmax(0, 1fr); max-width: 900px; }
+  .b-feat__text { position: sticky; top: calc(var(--header-h) + 20px); }
+  .b-feat__label { font-size: 0.62em; vertical-align: 0.15em; }
+  .b-feat__body { margin-top: 1.3em; font-size: 15px; max-width: 52ch; }
+  .b-feat__clip { margin-top: 28px; aspect-ratio: 16 / 9; overflow: hidden; max-width: 460px; }
+  .b-feat__clip video { width: 100%; height: 100%; object-fit: cover; }
+  .b-feat__media { display: grid; gap: 12px; grid-template-columns: repeat(6, 1fr); }
+  .b-feat__media :global(.m) { aspect-ratio: 3 / 4; }
+  /* collage: first image large */
+  .b-feat--collage .b-feat__media :global(.m1) { grid-column: 1 / -1; aspect-ratio: auto; }
+  .b-feat--collage .b-feat__media :global(.m1 img) { height: auto; object-fit: contain; }
+  .b-feat--collage .b-feat__media :global(.m:not(.m1)) { grid-column: span 2; }
+  .b-feat--collage .n-2 :global(.m2) { grid-column: 2 / span 4 !important; aspect-ratio: auto; }
+  .b-feat--collage .n-3 :global(.m:not(.m1)) { grid-column: span 3; aspect-ratio: 4 / 3; }
+  .b-feat--collage .n-4 :global(.m:not(.m1)) { grid-column: span 2; }
+  /* grid */
+  .b-feat--grid .b-feat__media :global(.m) { grid-column: span 2; }
+  .b-feat--grid .n-2 :global(.m) { grid-column: span 3; aspect-ratio: auto; }
+  .b-feat--grid .n-4 :global(.m) { grid-column: span 3; }
+  .b-feat--grid .n-7 :global(.m1) { grid-column: span 3; grid-row: span 2; aspect-ratio: auto; }
+  .b-feat--grid .n-7 :global(.m1 img) { height: 100%; }
+  .b-feat--grid .n-7 :global(.m:not(.m1)) { grid-column: span 3; aspect-ratio: 2 / 3; }
+  .b-feat--grid .n-7 { grid-template-columns: repeat(9, 1fr); }
+  @media (max-width: 860px) {
+    .b-feat__grid { grid-template-columns: 1fr; }
+    .b-feat--media-left .b-feat__text { order: 0; }
+    .b-feat__text { position: static; }
+  }
+
+  /* GALLERY */
+  .b-gal__heading { text-align: center; margin-bottom: clamp(24px, 4vw, 48px); }
+  .b-gal__grid { display: grid; gap: 12px; }
+  .b-gal--grid .b-gal__grid { grid-template-columns: repeat(3, 1fr); }
+  .b-gal--grid .b-gal__grid :global(.g) { aspect-ratio: 3 / 4; }
+  .b-gal--grid .n-3 :global(.g2) { aspect-ratio: auto; }
+  .b-gal--stack .b-gal__grid { gap: clamp(10px, 1.2vw, 18px); }
+  .b-gal--masonry .b-gal__grid { display: block; columns: 2 300px; column-gap: 14px; }
+  .b-gal--masonry .b-gal__grid :global(.g) { break-inside: avoid; margin-bottom: 14px; }
+  .b-gal--editorial .b-gal__grid { grid-template-columns: repeat(12, 1fr); align-items: end; }
+  .b-gal--editorial .b-gal__grid :global(.g1) { grid-column: 1 / span 6; grid-row: 1 / span 2; aspect-ratio: 5 / 6; }
+  .b-gal--editorial .b-gal__grid :global(.g:not(.g1)) { grid-column: span 2; aspect-ratio: 7 / 8; }
+  .b-gal--editorial .b-gal__grid :global(.g2) { grid-column: 7 / span 2; }
+  @media (max-width: 760px) {
+    .b-gal--grid .b-gal__grid { grid-template-columns: 1fr 1fr; }
+    .b-gal--grid .n-3 :global(.g3) { grid-column: 1 / -1; }
+    .b-gal--editorial .b-gal__grid { grid-template-columns: repeat(3, 1fr); }
+    .b-gal--editorial .b-gal__grid :global(.g1) { grid-column: 1 / -1; grid-row: auto; }
+    .b-gal--editorial .b-gal__grid :global(.g:not(.g1)) { grid-column: span 1; }
+  }
+
+  /* CAROUSEL */
+  .b-gal__full { position: relative; }
+  .carousel { position: relative; }
+  .carousel__track {
+    display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
+    padding-inline: var(--gutter); scroll-padding-inline: var(--gutter);
+    scrollbar-width: none; cursor: grab;
+  }
+  .carousel__track::-webkit-scrollbar { display: none; }
+  .carousel__track :global(.carousel__item) { flex: 0 0 clamp(240px, 30vw, 440px); aspect-ratio: 1; scroll-snap-align: start; }
+  .carousel__btn {
+    position: absolute; top: 50%; translate: 0 -50%;
+    display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%;
+    background: rgba(255,255,255,0.85); color: #000; border: 0; cursor: pointer;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+    transition: transform 0.4s var(--ease-out);
+  }
+  .carousel__btn:hover { transform: scale(1.08); }
+  .carousel__prev { left: calc(var(--gutter) - 10px); }
+  .carousel__next { right: calc(var(--gutter) - 10px); }
+
+  /* SINGLE IMAGE */
+  .b-img--medium .wrap { max-width: 1000px; }
+  .b-img__cap { font-size: 13px; margin-top: 12px; opacity: 0.8; }
+  .b-img :global(.media) { background: none; }
+
+  /* COLLAGE */
+  .b-col { position: relative; overflow: hidden; padding-block: clamp(60px, 8vw, 120px); }
+  .b-col__bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.55; }
+  .b-col__stage { position: relative; min-height: clamp(640px, 70vw, 980px); display: grid; place-items: center; }
+  .b-col__text { position: relative; z-index: 3; text-align: center; max-width: 12ch; font-size: clamp(40px, 5.2vw, 76px); }
+  .b-col__float { position: absolute; z-index: 2; }
+  .b-col__float :global(.media) { background: none; box-shadow: 0 24px 60px rgba(0,0,0,0.18); }
+  .b-col__float.f1 { top: 0; left: 50%; width: 38%; translate: -50% 0; z-index: 1; }
+  .b-col__float.f2 { top: 8%; left: 0; width: 12%; }
+  .b-col__float.f3 { top: 22%; left: 14%; width: 12%; }
+  .b-col__float.f4 { top: 12%; right: 6%; width: 12%; }
+  .b-col__float.f5 { bottom: 4%; right: 0; width: 28%; }
+  .b-col__float.f6 { bottom: 2%; left: 18%; width: 12%; }
+  .b-col__float.f7 { bottom: 10%; left: 0; width: 14%; }
+  @media (max-width: 760px) {
+    .b-col__stage { min-height: 0; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .b-col__text { order: -1; width: 100%; max-width: none; margin-bottom: 20px; }
+    .b-col__float { position: relative; inset: auto !important; translate: none !important; width: calc(50% - 5px) !important; }
+    .b-col__float.f1 { width: 100% !important; }
+  }
+
+  /* DETAILS */
+  .b-det__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 6vw, 100px); align-items: start; }
+  .b-det__intro { font-size: 15px; max-width: 56ch; }
+  .b-det__intro :global(p:first-child strong) { display: block; font-family: var(--font-display); font-weight: 400; font-size: clamp(30px, 3.6vw, 52px); line-height: 1.05; text-transform: uppercase; margin-bottom: 0.4em; }
+  .b-det__intro :global(p:first-child strong em) { display: inline-block; font-style: normal; transform: skewX(-12deg); }
+  .b-det__card { margin: 0; padding: clamp(22px, 2.6vw, 38px); background: var(--white); color: var(--black); display: grid; gap: 14px; font-size: 14px; }
+  .theme-white .b-det__card, .theme-pink .b-det__card { background: var(--black); color: var(--white); }
+  .b-det__card div { display: grid; grid-template-columns: 110px 1fr; gap: 12px; }
+  .b-det__card dt { font-weight: 700; }
+  .b-det__card dd { margin: 0; }
+  @media (max-width: 760px) { .b-det__grid { grid-template-columns: 1fr; } .b-det__card div { grid-template-columns: 1fr; gap: 2px; } }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((c) => {
+      const track = c.querySelector<HTMLElement>('[data-track]')!;
+      const step = () => (track.querySelector<HTMLElement>('.carousel__item')?.offsetWidth || 300) + 14;
+      c.querySelector('[data-prev]')!.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+      c.querySelector('[data-next]')!.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+      // drag to scroll with the mouse
+      let down = false, sx = 0, sl = 0, moved = false;
+      track.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; down = true; moved = false; sx = e.clientX; sl = track.scrollLeft; track.style.scrollSnapType = 'none'; });
+      addEventListener('pointermove', (e) => { if (!down) return; const dx = e.clientX - sx; if (Math.abs(dx) > 4) moved = true; track.scrollLeft = sl - dx; });
+      addEventListener('pointerup', () => { if (!down) return; down = false; track.style.scrollSnapType = ''; });
+      track.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); } }, true);
+    });
+  });
+</script>

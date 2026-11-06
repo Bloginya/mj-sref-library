@@ -1,0 +1,76 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icons.astro';
+interface Props { settings: any; current?: string }
+const { settings, current = '' } = Astro.props;
+const socials = [
+  settings.behance && { name: 'behance', url: settings.behance, label: 'Behance' },
+  settings.linkedin && { name: 'linkedin', url: settings.linkedin, label: 'LinkedIn' },
+  settings.instagram && { name: 'instagram', url: settings.instagram, label: 'Instagram' },
+].filter(Boolean) as { name: any; url: string; label: string }[];
+---
+<header class="site-header" data-header>
+  <div class="site-header__inner">
+    <a href="/" class="site-header__logo" aria-label="Darya Kruk — home"><Logo class="logo-svg" /></a>
+    <nav class="site-header__nav" aria-label="Main">
+      <a href="/portfolio" class:list={['nav-link', { active: current.startsWith('/portfolio') }]}>Portfolio</a>
+    </nav>
+    <div class="site-header__actions">
+      <ul class="socials" role="list">
+        {socials.map((s) => (
+          <li><a href={s.url} target="_blank" rel="noopener" aria-label={s.label}><Icon name={s.name} size={18} /></a></li>
+        ))}
+      </ul>
+      <a href="/#contact" class="btn btn--light header-cta">{settings.headerCta || 'Get Started'}</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 100;
+    color: var(--white);
+    mix-blend-mode: difference;
+    transition: transform 0.6s var(--ease-out);
+  }
+  .site-header.is-hidden { transform: translateY(-110%); }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    gap: clamp(16px, 3vw, 40px);
+    height: var(--header-h);
+    padding-inline: var(--gutter);
+  }
+  .site-header__logo { display: block; width: 46px; transition: transform 0.6s var(--ease-out); }
+  .site-header__logo:hover { transform: rotate(-8deg) scale(1.06); }
+  .site-header__logo :global(.logo-svg) { width: 100%; height: auto; }
+  .site-header__nav { flex: 1; }
+  .nav-link {
+    position: relative;
+    font-weight: 500;
+    font-size: 16px;
+    text-decoration: none;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -3px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .nav-link:hover::after, .nav-link.active::after { transform: scaleX(1); transform-origin: left; }
+  .site-header__actions { display: flex; align-items: center; gap: clamp(12px, 2vw, 24px); }
+  .socials { display: flex; gap: 14px; list-style: none; margin: 0; padding: 0; }
+  .socials a { display: block; transition: transform 0.4s var(--ease-out); }
+  .socials a:hover { transform: translateY(-3px); }
+  .header-cta { --h: 46px; padding: 0 1.6em; text-transform: none; font-size: 13px; }
+  @media (max-width: 560px) {
+    .socials { display: none; }
+    .header-cta { --h: 40px; padding: 0 1.2em; }
+  }
+</style>

@@ -1,0 +1,93 @@
+---
+import Base from '../../layouts/Base.astro';
+import Pic from '../../components/Pic.astro';
+import { getProjects } from '../../lib/content';
+const projects = await getProjects();
+---
+<Base title="Portfolio" description="Selected work by Darya Kruk — AI campaigns, avatar creation, concept design for Coca-Cola, Sunnei, Hand in Hand, Dr. Squatch and more.">
+  <section class="pf theme-black">
+    <h1 class="sr-only">Portfolio</h1>
+    <ul class="pf__list" role="list">
+      {projects.map((p, i) => (
+        <li data-reveal style={`--d:${i}`}>
+          <a href={`/portfolio/${p.slug}`} class="pf__item" data-preview={i}>
+            <span class="pf__num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="pf__name">{p.name}</span>
+          </a>
+          <div class="pf__mobile-img"><Pic src={p.cover} alt={p.name} reveal={false} sizes="100vw" /></div>
+        </li>
+      ))}
+    </ul>
+    <div class="pf__previews" aria-hidden="true">
+      {projects.map((p, i) => (
+        <div class="pf__preview" data-preview-img={i}><Pic src={p.cover} alt="" reveal={false} sizes="460px" eager={i < 2} /></div>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .pf { position: relative; min-height: 100svh; display: grid; place-items: center; padding: calc(var(--header-h) + 40px) var(--gutter) 80px; overflow: hidden; }
+  .pf__list { list-style: none; margin: 0; padding: 0; text-align: center; position: relative; z-index: 2; }
+  .pf__item {
+    position: relative;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.4em;
+    font-family: var(--font-display);
+    font-size: clamp(48px, 9vw, 132px);
+    line-height: 1.12;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: opacity 0.5s var(--ease-out), transform 0.6s var(--ease-out);
+  }
+  .pf__num { font-family: var(--font-body); font-size: 13px; font-weight: 500; margin-top: 1.6em; opacity: 0.6; }
+  .pf__list:hover .pf__item { opacity: 0.25; }
+  .pf__list:hover .pf__item:hover { opacity: 1; transform: translateX(12px); }
+  .pf__previews { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+  .pf__preview {
+    position: absolute; left: 0; top: 0;
+    width: clamp(260px, 30vw, 460px); aspect-ratio: 4 / 5;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.85) rotate(-4deg);
+    transition: opacity 0.4s var(--ease-out), transform 0.6s var(--ease-out);
+    will-change: transform, left, top;
+  }
+  .pf__preview :global(.media) { height: 100%; }
+  .pf__preview.is-active { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  .pf__mobile-img { display: none; }
+  @media (hover: none), (max-width: 760px) {
+    .pf__previews { display: none; }
+    .pf__list:hover .pf__item { opacity: 1; }
+    .pf__mobile-img { display: block; aspect-ratio: 16 / 10; margin: 8px 0 32px; }
+    .pf__mobile-img :global(.media) { height: 100%; }
+    .pf__item { font-size: clamp(42px, 13vw, 80px); }
+  }
+</style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const items = document.querySelectorAll<HTMLElement>('[data-preview]');
+    const imgs = document.querySelectorAll<HTMLElement>('[data-preview-img]');
+    if (!items.length) return;
+    let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, raf = 0, active: HTMLElement | null = null;
+    const loop = () => {
+      cx += (x - cx) * 0.14; cy += (y - cy) * 0.14;
+      if (active) { active.style.left = `${cx}px`; active.style.top = `${cy}px`; }
+      raf = requestAnimationFrame(loop);
+    };
+    const onMove = (e: PointerEvent) => { x = e.clientX; y = e.clientY; };
+    addEventListener('pointermove', onMove);
+    items.forEach((it) => {
+      it.addEventListener('pointerenter', (e) => {
+        active?.classList.remove('is-active');
+        active = imgs[Number(it.dataset.preview)];
+        cx = e.clientX; cy = e.clientY;
+        active.classList.add('is-active');
+        if (!raf) raf = requestAnimationFrame(loop);
+      });
+      it.addEventListener('pointerleave', () => { active?.classList.remove('is-active'); });
+    });
+    document.addEventListener('astro:before-swap', () => { cancelAnimationFrame(raf); removeEventListener('pointermove', onMove); }, { once: true });
+  });
+</script>

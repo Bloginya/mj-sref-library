@@ -1,0 +1,74 @@
+{
+  "name": "Dr. Squatch",
+  "order": 4,
+  "cover": "/src/assets/images/projects/squatch/cover.webp",
+  "seoTitle": "Dr. Squatch × Kit Kat — Limited Edition concept",
+  "seoDescription": "A rapid-response design concept: Dr. Squatch × Kit Kat limited edition soap collection, inspired by the viral 'Official Squatch Statement'. Concept design by Darya Kruk.",
+  "sections": [
+    {
+      "discriminant": "hero",
+      "value": {
+        "background": "black",
+        "backgroundImage": "/src/assets/images/projects/squatch/gemini-generated-image-p8pp7ip8pp7ip8pp.webp",
+        "eyebrow": "",
+        "title": "Dr. Squatch x Kit Kat",
+        "subtitle": "Limited Edition Collection | concept design",
+        "align": "left"
+      }
+    },
+    {
+      "discriminant": "feature",
+      "value": {
+        "background": "white",
+        "label": "",
+        "title": "The Concept",
+        "body": "Born from ((a viral moment)), this project is a rapid-response design concept inspired by the \"Official Squatch Statement\" regarding Kit Kat’s missing 12 tons of chocolate. If ((Dr. Squatch)) \"found\" the ingredients, this is how they’d use them.",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/squatch/img-2895-1.webp",
+            "alt": "Official Squatch Statement"
+          },
+          {
+            "image": "/src/assets/images/projects/squatch/2a739dd5-86c4-44f9-9b67-cd206212411f-i-k.webp",
+            "alt": "Kit Kat bar"
+          }
+        ],
+        "video": null,
+        "mediaPosition": "left",
+        "layout": "collage"
+      }
+    },
+    {
+      "discriminant": "image",
+      "value": {
+        "background": "black",
+        "image": "/src/assets/images/projects/squatch/screenshot-2026-04-14-at-01-39-14.webp",
+        "alt": "Dr. Squatch × Kit Kat limited edition collection board",
+        "caption": "",
+        "size": "wide"
+      }
+    },
+    {
+      "discriminant": "gallery",
+      "value": {
+        "background": "pink",
+        "heading": "",
+        "style": "masonry",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/squatch/close-up-model-202604140153.webp",
+            "alt": "Model holding the Kit Kat soap"
+          },
+          {
+            "image": "/src/assets/images/projects/squatch/3-types.webp",
+            "alt": "Three soap flavours"
+          },
+          {
+            "image": "/src/assets/images/projects/squatch/show-only-ferst-202604140214.webp",
+            "alt": "Purity — white chocolate soap"
+          }
+        ]
+      }
+    }
+  ]
+}

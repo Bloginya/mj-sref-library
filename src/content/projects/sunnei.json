@@ -1,0 +1,279 @@
+{
+  "name": "Sunnei",
+  "order": 2,
+  "cover": "/src/assets/images/projects/sunnei/cover.webp",
+  "seoTitle": "Sunnei × AI — Spiky Labauletto Campaign",
+  "seoDescription": "A fully AI-generated fashion campaign for Sunnei's Spiky Labauletto Leather Shoulder Bag — art direction, GenAI model creation, styling, scene generation and campaign production by Darya Kruk.",
+  "sections": [
+    {
+      "discriminant": "hero",
+      "value": {
+        "background": "black",
+        "backgroundImage": null,
+        "eyebrow": "",
+        "title": "Sunnei × AI —\nSpiky Labauletto Campaign",
+        "subtitle": "_AI Fashion Concept & Creative Direction_",
+        "align": "center"
+      }
+    },
+    {
+      "discriminant": "video",
+      "value": {
+        "background": "black",
+        "video": "/videos/sunnei-hero.mp4",
+        "poster": "/src/assets/images/projects/sunnei/sunnei-hero-poster.jpg",
+        "caption": "",
+        "size": "full",
+        "autoplay": false
+      }
+    },
+    {
+      "discriminant": "text",
+      "value": {
+        "background": "black",
+        "heading": "_Project Overview_",
+        "body": "A fully AI-generated fashion campaign for Sunnei's Spiky Labauletto Leather Shoulder Bag — conceived, art-directed, and produced using generative AI from start to finish. The project explores what happens when creative vision meets cutting-edge image synthesis: a complete campaign ecosystem built without a traditional photoshoot, yet indistinguishable from one.\n\nThe result is a desert editorial — raw, sun-baked, and deliberately strange — that mirrors the bag's own contrasts:\nthe softness of leather against the aggression of green spikes, the luxury of Italian craftsmanship against the wildness of the Sonoran landscape.",
+        "size": "normal",
+        "align": "left"
+      }
+    },
+    {
+      "discriminant": "marquee",
+      "value": {
+        "background": "black",
+        "items": [
+          "Sunnei × AI"
+        ],
+        "style": "big"
+      }
+    },
+    {
+      "discriminant": "gallery",
+      "value": {
+        "background": "pink",
+        "heading": "((_Gallery_))",
+        "style": "editorial",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/sunnei/editorial-fashion-photography-2026041221.webp",
+            "alt": "Model sitting in the desert with the Sunnei Spiky Labauletto bag"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/change-bacground-to-202604141151.webp",
+            "alt": "Sunnei bag in a desert landscape"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/ezgif-70f0f8b343877cf3.gif",
+            "alt": "Animated desert scene"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/download-3.webp",
+            "alt": "Close-up of the Sunnei logo on the bag"
+          }
+        ]
+      }
+    },
+    {
+      "discriminant": "feature",
+      "value": {
+        "background": "black",
+        "label": "step #1_",
+        "title": "Model Generation",
+        "body": "A unique AI fashion model was built from scratch: specific facial features, skin texture, hair curl pattern, and coloring were engineered to create a consistent, ownable identity for the campaign. No stock images. No real person. A new face, built for Sunnei.",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/sunnei/prompt-model-202604130025-1.webp",
+            "alt": "AI model generation — face studies"
+          }
+        ],
+        "video": "/videos/sunnei-model.mp4",
+        "mediaPosition": "right",
+        "layout": "collage"
+      }
+    },
+    {
+      "discriminant": "feature",
+      "value": {
+        "background": "pink",
+        "label": "step #2_",
+        "title": "Styling",
+        "body": "The model was dressed digitally in looks aligned with Sunnei's SS aesthetic — green leather corset, pink mesh layering, flared leather trousers — styled to echo the bag's colorway and tactile tension. The Spiky Labauletto was integrated as both accessory\nand protagonist.",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/sunnei/sunneilogo-reveal-in-a-fashion-photograp.webp",
+            "alt": "Styling look 1"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/sunneilogo-reveal-in-a-fashion-photograp-3.webp",
+            "alt": "Styling look 2"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/sunneilogo-reveal-in-a-minimalist-fashio.webp",
+            "alt": "Styling look 3"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/sunneilogo-reveal-a-person-with-dark-cur.webp",
+            "alt": "Styling look — back view"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/sunneilogo-reveal-in-a-fashion-photograp-2.webp",
+            "alt": "Styling look 4"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/sunnei29894361-58967157-1000.webp",
+            "alt": "Original Sunnei Spiky Labauletto bag"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/replace-model-on-202604121938-2.webp",
+            "alt": "Full look with the bag"
+          }
+        ],
+        "video": null,
+        "mediaPosition": "left",
+        "layout": "grid"
+      }
+    },
+    {
+      "discriminant": "feature",
+      "value": {
+        "background": "white",
+        "label": "step #3_",
+        "title": "Scene Creation",
+        "body": "Desert environments were constructed as AI-generated backdrops: cracked earth, towering saguaro, golden-hour dust, and prickly pear fields. Each scene was selected and refined to amplify the bag's spiky character and create visual storytelling continuity across the campaign.",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/sunnei/show-only-the-202604131154.webp",
+            "alt": "Desert scene with cacti"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/show-panoramic-place-202604131448.webp",
+            "alt": "Panoramic desert"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/ezgif-70f0f8b343877cf3.gif",
+            "alt": "Animated desert"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/bg-f.webp",
+            "alt": "Desert background"
+          }
+        ],
+        "video": null,
+        "mediaPosition": "right",
+        "layout": "collage"
+      }
+    },
+    {
+      "discriminant": "video",
+      "value": {
+        "background": "black",
+        "video": "/videos/sunnei-photoshoot.mp4",
+        "poster": "/src/assets/images/projects/sunnei/sunnei-photoshoot-poster.jpg",
+        "caption": "",
+        "size": "full",
+        "autoplay": true
+      }
+    },
+    {
+      "discriminant": "details",
+      "value": {
+        "background": "black",
+        "intro": "**_Step #4_ — Fashion GenAI Photoshoot**\n\nAll elements — model, styling, environment — were composited into final campaign images across multiple formats: editorial portraits, close-up product frames, wide-angle lifestyle shots, and a short motion piece. Campaign outputs were extended into OOH advertising mockups (billboard, bus shelter).",
+        "items": [
+          {
+            "label": "Deliverables",
+            "text": "Full campaign gallery / Video reel / Print & digital advertising assets / Billboard mockups"
+          },
+          {
+            "label": "Scope",
+            "text": "Art direction · GenAI model creation · Styling · Scene generation · Storytelling · Campaign production"
+          },
+          {
+            "label": "Brand",
+            "text": "Sunnei — Made in Italy"
+          }
+        ]
+      }
+    },
+    {
+      "discriminant": "gallery",
+      "value": {
+        "background": "black",
+        "heading": "",
+        "style": "grid",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/sunnei/bag-advertisment-fish-202604171409.webp",
+            "alt": "Bag advertisement"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/model-posing-in-202604141152.webp",
+            "alt": "Model posing in the city"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/prompt-ultra-luxury-202604171351.webp",
+            "alt": "Ultra-luxury storefront"
+          }
+        ]
+      }
+    },
+    {
+      "discriminant": "gallery",
+      "value": {
+        "background": "black",
+        "heading": "",
+        "style": "stack",
+        "images": [
+          {
+            "image": "/src/assets/images/projects/sunnei/sunneilogo-reveal-in-a-studio-portrait-s.webp",
+            "alt": "Studio portrait with the bag"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/fashion.webp",
+            "alt": "Fashion campaign shot"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/close-up-of-sharp-202604221127-1.webp",
+            "alt": "Close-up of the spikes"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/dramatic-cinematic-close-202604171440-2.webp",
+            "alt": "Dramatic cinematic close-up"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/cinematic-surrial-action-202604202059.webp",
+            "alt": "Surreal cinematic action"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/surrial-camera-angle-202604182239.webp",
+            "alt": "Surreal camera angle"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/scorpions-holdin-surrial-202604202047.webp",
+            "alt": "Scorpions holding the bag"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/project-title-vogue-202604171413.webp",
+            "alt": "Vogue-style editorial"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/bag-on-the-202604181006-1.webp",
+            "alt": "Bag on a rock"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/cinematic-commersial-ad-202604202036.webp",
+            "alt": "Cinematic commercial ad"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/man-behind-the-202604182048-1.webp",
+            "alt": "Couple with the bag"
+          },
+          {
+            "image": "/src/assets/images/projects/sunnei/cinematic-surrial-action-202604202101.webp",
+            "alt": "Surreal desert scene"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icons.astro';
+interface Props { settings: any }
+const { settings } = Astro.props;
+const year = new Date().getFullYear();
+const socials = [
+  settings.behance && { name: 'behance', url: settings.behance, label: 'Behance' },
+  settings.linkedin && { name: 'linkedin', url: settings.linkedin, label: 'LinkedIn' },
+  settings.instagram && { name: 'instagram', url: settings.instagram, label: 'Instagram' },
+].filter(Boolean) as { name: any; url: string; label: string }[];
+---
+<footer class="site-footer theme-black">
+  <div class="wrap site-footer__inner">
+    <div>
+      <a href="/" class="site-footer__logo" aria-label="Darya Kruk — home"><Logo class="logo-svg" /></a>
+      <p class="site-footer__text">{settings.footerText || 'Made by Darya Kruk'}<br />{year}©</p>
+    </div>
+    <ul class="socials" role="list">
+      {socials.map((s) => (
+        <li><a href={s.url} target="_blank" rel="noopener" aria-label={s.label}><Icon name={s.name} size={18} /></a></li>
+      ))}
+    </ul>
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: #020202; padding-block: 48px 40px; }
+  .site-footer__inner { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+  .site-footer__logo { display: block; width: 52px; margin-bottom: 18px; animation: float 4s ease-in-out infinite; }
+  .site-footer__logo :global(.logo-svg) { width: 100%; height: auto; transition: transform 0.4s var(--ease-out), filter 0.4s; }
+  .site-footer__logo:hover :global(.logo-svg) { transform: scale(1.12) rotate(3deg); filter: drop-shadow(0 0 14px rgba(255,255,255,.7)); }
+  .site-footer__text { font-size: 14px; opacity: 0.85; margin: 0; }
+  .socials { display: flex; gap: 16px; list-style: none; margin: 0; padding: 0; }
+  .socials a { display: block; transition: transform 0.4s var(--ease-out); }
+  .socials a:hover { transform: translateY(-3px); }
+  @keyframes float { 50% { transform: translateY(-6px); } }
+  @media (prefers-reduced-motion: reduce) { .site-footer__logo { animation: none; } }
+</style>

@@ -1,0 +1,142 @@
+{
+  "hero": {
+    "image": "/src/assets/images/home/dk-logo.webp",
+    "topLeft": "If you\nneed …",
+    "topRight": "AI ARTIST\nUX/UI DSGNR\nDSCN TEAM LEAD\nCREATIVE GRAPHIC DSGNR",
+    "bottomLeft": "GRAPHIC DESIGN\nCONCEPT DESIGN\nAI GENERATED ART\nWEBSITE DESIGN\nAD CREATIVES\nGRAPHIC DESIGN\nSOCIAL MEDIA CONTENT",
+    "bottomRight": "I’m your\ndesigner",
+    "ctaLabel": "Let’s get to work ➺"
+  },
+  "services": [
+    "Graphic design",
+    "Concept design",
+    "AI generated art",
+    "Animated visual for your brand",
+    "Social media banners",
+    "Landing page design"
+  ],
+  "about": {
+    "kicker": "Creative dsgnr",
+    "name": "Darya Kruk",
+    "photo": "/src/assets/images/home/me.webp",
+    "text": "I'M DARYA — AI ARTIST, GRAPHIC DESIGNER & CREATIVE TEAM LEAD.\n\nI COMBINE 8 YEARS OF DESIGN EXPERTISE WITH THE MOST POWERFUL GENAI TOOLS ON THE MARKET — MIDJOURNEY, U, KLING AI, NANO BANANA PRO, STABLE DIFFUSION, AND 10+ MORE — TO CREATE VISUALS THAT STOP THE SCROLL AND DRIVE REAL RESULTS.\n\nFROM CONCEPT TO PRODUCTION-READY ASSETS, FASTER THAN ANY TRADITIONAL WORKFLOW.\n\nTRUSTED BY COCA-COLA, NIKE, GOOGLE, META, LENOVO & MERCEDES-BENZ.",
+    "tagline": "One designer + AI = results that used to take a team."
+  },
+  "stats": [
+    {
+      "value": 8,
+      "suffix": "+",
+      "label": "years in design"
+    },
+    {
+      "value": 3000,
+      "suffix": "+",
+      "label": "AI avatars crafted for Coca-Cola"
+    },
+    {
+      "value": 1,
+      "suffix": "M+",
+      "label": "generated variations"
+    },
+    {
+      "value": 10,
+      "suffix": "+",
+      "label": "GenAI tools mastered"
+    }
+  ],
+  "projectsTitle": "Past Projects",
+  "featured": [
+    {
+      "project": "sunnei",
+      "badge": "New",
+      "title": "Sunnei\nSpiky Labauletto bag",
+      "tagline": "AI visual campaign",
+      "image": "/src/assets/images/home/couple.webp"
+    },
+    {
+      "project": "fresco",
+      "badge": "",
+      "title": "_Coca-Cola:_\nThe Fresco",
+      "tagline": "AI avatar creation, UI, Pitch deck",
+      "image": "/src/assets/images/home/frame-1000007260.webp"
+    },
+    {
+      "project": "handandhand",
+      "badge": "",
+      "title": "Hand in Hand × AI —\nconcept campaign",
+      "tagline": "AI Creative Production & Campaign",
+      "image": "/src/assets/images/home/advertisment-digital-banner-202604141420.webp"
+    }
+  ],
+  "reelTitle": "Selected visuals",
+  "reel": [
+    {
+      "image": "/src/assets/images/home/reel/01-sunneilogo-reveal-in-a-studio-portrait-s.webp",
+      "alt": "Sunnei studio portrait"
+    },
+    {
+      "image": "/src/assets/images/home/reel/02-florian-1.webp",
+      "alt": "La Fresque torchbearers"
+    },
+    {
+      "image": "/src/assets/images/home/reel/03-scorpions-holdin-surrial-202604202047.webp",
+      "alt": "Scorpions holding the Sunnei bag"
+    },
+    {
+      "image": "/src/assets/images/home/reel/04-model-with-fake-202604141328.webp",
+      "alt": "Hand in Hand foam beard"
+    },
+    {
+      "image": "/src/assets/images/home/reel/05-project-title-vogue-202604171413.webp",
+      "alt": "Sunnei Vogue-style editorial"
+    },
+    {
+      "image": "/src/assets/images/home/reel/06-close-up-model-202604140153.webp",
+      "alt": "Dr. Squatch × Kit Kat"
+    },
+    {
+      "image": "/src/assets/images/home/reel/07-dramatic-cinematic-close-202604171440-2.webp",
+      "alt": "Sunnei cinematic close-up"
+    },
+    {
+      "image": "/src/assets/images/home/reel/08-product-photo-with-202604021908.webp",
+      "alt": "Hand in Hand holographic product"
+    },
+    {
+      "image": "/src/assets/images/home/reel/09-cinematic-surrial-action-202604202059.webp",
+      "alt": "Sunnei surreal desert scene"
+    },
+    {
+      "image": "/src/assets/images/home/reel/10-make-a-iphone-202604122317.webp",
+      "alt": "The Fresco mobile app"
+    }
+  ],
+  "testimonialsTitle": "Client testimonials",
+  "testimonials": [
+    {
+      "quote": "Darya is an incredible addition to any team — not only for her extensive capabilities and inquisitive nature in emerging technologies and workflows, but also for her glowing personality that can light up any project.",
+      "name": "Yifei Chai",
+      "role": "Executive Creative Director at UNIT9"
+    },
+    {
+      "quote": "It's a great strong skilled AI designer, with high taste and strong AI software knowledge Darya is great team supporter leveraging projects and Art Direction on next level. I'm always happy to work for any brands around the globe with Darya.",
+      "name": "Michal Wojciechowski",
+      "role": "Art Director Unit9"
+    },
+    {
+      "quote": "We had a fantastic experience working with Darya. She delivered high-quality, on-brand assets that were both creative and visually engaging. She understood our vision quickly, communicated clearly throughout, and delivered everything on time. Highly recommended for any brand-focused design work.",
+      "name": "Beatrice Ionascu",
+      "role": "Co-Founder and CTO at imagi"
+    }
+  ],
+  "clients": [
+    "Coca-Cola",
+    "Nike",
+    "Meta",
+    "Google",
+    "Lego",
+    "WizzAir",
+    "Harbin Beer",
+    "Lenovo"
+  ]
+}

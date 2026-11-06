@@ -1,0 +1,89 @@
+---
+import Icon from './Icons.astro';
+---
+<div class="lightbox" data-lightbox hidden transition:persist>
+  <button class="lightbox__close" data-lb-close aria-label="Close"><Icon name="close" size={28} /></button>
+  <button class="lightbox__nav lightbox__prev" data-lb-prev aria-label="Previous image"><Icon name="left" size={32} /></button>
+  <img class="lightbox__img" alt="" data-lb-img />
+  <button class="lightbox__nav lightbox__next" data-lb-next aria-label="Next image"><Icon name="right" size={32} /></button>
+  <p class="lightbox__count" data-lb-count></p>
+</div>
+
+<style>
+  .lightbox {
+    position: fixed; inset: 0; z-index: 300;
+    display: grid; place-items: center;
+    background: rgba(0, 0, 0, 0.94);
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-out);
+  }
+  .lightbox.is-open { opacity: 1; }
+  .lightbox[hidden] { display: none; }
+  .lightbox__img {
+    max-width: min(92vw, 1600px); max-height: 88vh; width: auto; height: auto;
+    object-fit: contain;
+    transform: scale(0.96);
+    transition: transform 0.5s var(--ease-out);
+  }
+  .lightbox.is-open .lightbox__img { transform: none; }
+  .lightbox button { position: absolute; background: none; border: 0; color: inherit; cursor: pointer; padding: 12px; }
+  .lightbox__close { top: 12px; right: 12px; }
+  .lightbox__prev { left: 8px; top: 50%; translate: 0 -50%; }
+  .lightbox__next { right: 8px; top: 50%; translate: 0 -50%; }
+  .lightbox__count { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: 13px; opacity: 0.7; margin: 0; }
+</style>
+
+<script>
+  const lb = document.querySelector<HTMLElement>('[data-lightbox]')!;
+  const imgEl = lb.querySelector<HTMLImageElement>('[data-lb-img]')!;
+  const count = lb.querySelector<HTMLElement>('[data-lb-count]')!;
+  let group: HTMLElement[] = [];
+  let idx = 0;
+  let lastFocus: HTMLElement | null = null;
+
+  const show = (i: number) => {
+    idx = (i + group.length) % group.length;
+    const el = group[idx];
+    imgEl.src = el.dataset.full || el.querySelector('img')?.currentSrc || '';
+    imgEl.alt = el.querySelector('img')?.alt || '';
+    count.textContent = group.length > 1 ? `${idx + 1} / ${group.length}` : '';
+  };
+  const open = (el: HTMLElement) => {
+    const g = el.dataset.group;
+    group = g ? [...document.querySelectorAll<HTMLElement>(`[data-zoom][data-group="${g}"]`)] : [el];
+    lastFocus = document.activeElement as HTMLElement;
+    lb.hidden = false;
+    requestAnimationFrame(() => lb.classList.add('is-open'));
+    document.body.style.overflow = 'hidden';
+    show(group.indexOf(el));
+    lb.querySelector<HTMLElement>('[data-lb-close]')!.focus();
+  };
+  const close = () => {
+    lb.classList.remove('is-open');
+    document.body.style.overflow = '';
+    setTimeout(() => { lb.hidden = true; imgEl.src = ''; }, 300);
+    lastFocus?.focus();
+  };
+
+  document.addEventListener('click', (e) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>('[data-zoom]');
+    if (el) { e.preventDefault(); open(el); }
+  });
+  lb.querySelector('[data-lb-close]')!.addEventListener('click', close);
+  lb.querySelector('[data-lb-prev]')!.addEventListener('click', () => show(idx - 1));
+  lb.querySelector('[data-lb-next]')!.addEventListener('click', () => show(idx + 1));
+  lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+  document.addEventListener('keydown', (e) => {
+    if (lb.hidden) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') show(idx - 1);
+    if (e.key === 'ArrowRight') show(idx + 1);
+  });
+  let sx = 0;
+  lb.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
+  });
+</script>
